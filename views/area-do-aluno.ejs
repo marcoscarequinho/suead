@@ -1,0 +1,60 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+
+<main id="conteudo">
+  <section class="capa-aluno">
+    <span class="etiqueta">Área do aluno</span>
+    <h1>Comece pelo teste de nivelamento</h1>
+    <p>Responda ao simulado curto de uma matéria e a IA posiciona você no nível certo da trilha —
+      básico, intermediário ou avançado.</p>
+  </section>
+
+  <section class="secao">
+    <div class="nivelamento">
+      <form id="form-nivelamento" class="cartao">
+        <h2>Teste de nivelamento</h2>
+
+        <label for="niv-materia">Matéria</label>
+        <select id="niv-materia" name="materia" required>
+          <% materias.forEach(function (m) { %>
+          <option value="<%= m.slug %>"><%= m.icone %> <%= m.nome %></option>
+          <% }) %>
+        </select>
+
+        <label for="niv-acertos">Quantas questões você acertou?</label>
+        <input type="range" id="niv-acertos" name="acertos" min="0" max="10" value="5" step="1">
+        <output id="niv-saida" for="niv-acertos">5 de 10</output>
+
+        <button type="submit" class="btn btn-primario btn-bloco">Calcular meu nível</button>
+        <p class="nota">Envia <code>POST /api/nivelamento</code> — a mesma rota usada pelo simulado completo.</p>
+      </form>
+
+      <div class="cartao resultado" id="resultado-nivelamento" hidden>
+        <h2>Seu ponto de partida</h2>
+        <p class="resultado-nivel" id="res-nivel"></p>
+        <p class="resultado-linha" id="res-aproveitamento"></p>
+        <p class="resultado-linha" id="res-justificativa"></p>
+        <p class="resultado-linha" id="res-comecar"></p>
+        <a class="btn btn-secundario btn-bloco" id="res-link" href="#">Abrir primeira aula</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="secao escuro">
+    <header class="secao-cabecalho">
+      <span class="etiqueta">Minhas matérias</span>
+      <h2>Retome de onde parou</h2>
+    </header>
+    <div class="grade-materias compacta">
+      <% materias.forEach(function (m) { %>
+      <a class="card-materia mini" href="/aula/<%= m.slug %>/basico" style="--cor-materia: <%= m.cor %>">
+        <span class="card-icone" aria-hidden="true"><%= m.icone %></span>
+        <h3><%= m.nome %></h3>
+        <p class="card-avatar">com <%= m.avatar %></p>
+      </a>
+      <% }) %>
+    </div>
+  </section>
+</main>
+
+<%- include('partials/footer') %>

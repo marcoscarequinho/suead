@@ -1,0 +1,217 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+
+<main id="conteudo">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero" id="inicio">
+    <div class="hero-texto">
+      <span class="selo">🤖 Aulas com avatares de IA · turma de 1 aluno: você</span>
+      <h1>Aprenda com professores <span class="destaque">avatares de IA</span> do básico ao avançado</h1>
+      <p class="subtitulo">
+        Exatas, humanas, idiomas e cursos técnicos ensinados por avatares que falam,
+        explicam quantas vezes você precisar e adaptam o ritmo da aula às suas dúvidas —
+        em tempo real, 24 horas por dia.
+      </p>
+      <div class="hero-acoes">
+        <a href="/area-do-aluno" class="btn btn-primario btn-grande">Comece grátis</a>
+        <a href="#materias" class="btn btn-secundario btn-grande">Conheça as matérias</a>
+      </div>
+      <ul class="hero-provas">
+        <li><strong><%= materias.length %></strong> matérias completas</li>
+        <li><strong>3</strong> níveis por matéria</li>
+        <li><strong>24/7</strong> tira-dúvidas</li>
+      </ul>
+    </div>
+
+    <div class="hero-visual">
+      <div class="sala">
+        <div class="sala-topo">
+          <span class="ponto ao-vivo"></span> Aula ao vivo · <strong>Prof. Ada</strong>
+        </div>
+        <div class="sala-palco">
+          <div class="avatar-circulo">
+            <span class="avatar-face">👩‍🏫</span>
+            <span class="onda"></span>
+            <span class="onda onda-2"></span>
+          </div>
+          <p class="legenda" id="legenda-avatar">Vamos resolver esta equação juntos, passo a passo.</p>
+        </div>
+        <div class="sala-chat">
+          <div class="balao aluno">Não entendi a parte do delta 🤔</div>
+          <div class="balao professor">Sem problema — vou refazer com outro exemplo, mais devagar.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MATÉRIAS ============ -->
+  <section class="secao materias" id="materias">
+    <header class="secao-cabecalho">
+      <span class="etiqueta">Matérias</span>
+      <h2>Do básico ao avançado, na ordem certa</h2>
+      <p>Cada matéria tem três níveis de proficiência. O teste de nivelamento coloca você
+        exatamente no ponto onde precisa começar — sem repetir o que já sabe.</p>
+    </header>
+
+    <div class="grade-materias">
+      <% materias.forEach(function (materia) { %>
+      <article class="card-materia" style="--cor-materia: <%= materia.cor %>">
+        <div class="card-materia-topo">
+          <span class="card-icone" aria-hidden="true"><%= materia.icone %></span>
+          <div>
+            <h3><%= materia.nome %></h3>
+            <p class="card-avatar">com <%= materia.avatar %></p>
+          </div>
+        </div>
+        <p class="card-resumo"><%= materia.resumo %></p>
+
+        <div class="niveis" role="tablist" aria-label="Níveis de <%= materia.nome %>">
+          <% materia.niveis.forEach(function (nivel, i) { %>
+          <button
+            class="nivel-btn <%= i === 0 ? 'ativo' : '' %>"
+            role="tab"
+            type="button"
+            aria-selected="<%= i === 0 %>"
+            data-materia="<%= materia.slug %>"
+            data-nivel="<%= nivel.id %>"><%= nivel.nome %></button>
+          <% }) %>
+        </div>
+
+        <% materia.niveis.forEach(function (nivel, i) { %>
+        <div class="nivel-painel<%= i === 0 ? ' ativo' : '' %>"
+             data-materia="<%= materia.slug %>"
+             data-painel="<%= nivel.id %>"
+             <%= i === 0 ? '' : 'hidden' %>>
+          <p class="nivel-descricao"><%= nivel.descricao %></p>
+          <ul class="nivel-topicos">
+            <% nivel.topicos.forEach(function (t) { %><li><%= t %></li><% }) %>
+          </ul>
+          <p class="nivel-duracao"><%= nivel.duracao %></p>
+        </div>
+        <% }) %>
+
+        <a class="card-link" href="/materias/<%= materia.slug %>">Ver trilha completa →</a>
+      </article>
+      <% }) %>
+    </div>
+  </section>
+
+  <!-- ============ DIFERENCIAIS DA IA ============ -->
+  <section class="secao escuro" id="como-funciona">
+    <header class="secao-cabecalho">
+      <span class="etiqueta">Como funciona</span>
+      <h2>O que um avatar de IA faz que uma videoaula não faz</h2>
+      <p>Videoaula é gravada e igual para todo mundo. O avatar responde a você.</p>
+    </header>
+
+    <div class="grade-diferenciais">
+      <article class="card-diferencial">
+        <span class="dif-icone">🗣️</span>
+        <h3>Interatividade em tempo real</h3>
+        <p>Interrompa a aula com a mão levantada. O avatar para, responde e retoma o
+          raciocínio de onde estava — com voz, expressão facial e sincronia labial.</p>
+      </article>
+      <article class="card-diferencial">
+        <span class="dif-icone">🌙</span>
+        <h3>Tira-dúvidas 24/7</h3>
+        <p>Estudou às 2h da manhã e travou? A barra lateral de dúvidas está aberta em
+          toda aula, por texto ou voz, com o contexto exato do que você está vendo.</p>
+      </article>
+      <article class="card-diferencial">
+        <span class="dif-icone">📈</span>
+        <h3>Adaptação de ritmo</h3>
+        <p>Acertou de primeira, o avatar acelera. Errou duas vezes, ele muda a abordagem
+          e volta ao pré-requisito que faltou — sem você precisar pedir.</p>
+      </article>
+      <article class="card-diferencial">
+        <span class="dif-icone">🧭</span>
+        <h3>Trilha adaptativa</h3>
+        <p>Um teste de nivelamento por matéria define seu ponto de partida: básico,
+          intermediário ou avançado. A trilha se reorganiza a cada avaliação.</p>
+      </article>
+    </div>
+
+    <ol class="passos">
+      <li><strong>1. Faça o nivelamento</strong><span>10 questões por matéria, 8 minutos.</span></li>
+      <li><strong>2. Receba sua trilha</strong><span>A IA monta a sequência de aulas para você.</span></li>
+      <li><strong>3. Estude com o avatar</strong><span>Aula interativa, com dúvida liberada a qualquer momento.</span></li>
+      <li><strong>4. Evolua de nível</strong><span>Avaliações liberam o próximo estágio da matéria.</span></li>
+    </ol>
+
+    <div class="centralizar">
+      <a href="/aula/matematica/basico" class="btn btn-claro btn-grande">Ver uma aula demonstrativa</a>
+    </div>
+  </section>
+
+  <!-- ============ DEPOIMENTOS ============ -->
+  <section class="secao" id="depoimentos">
+    <header class="secao-cabecalho">
+      <span class="etiqueta">Resultados</span>
+      <h2>Alunos que saíram do básico e chegaram ao avançado</h2>
+    </header>
+
+    <div class="grade-depoimentos">
+      <% depoimentos.forEach(function (d) { %>
+      <figure class="card-depoimento">
+        <div class="evolucao">
+          <span class="nivel-de"><%= d.de %></span>
+          <span class="seta" aria-label="evoluiu para">→</span>
+          <span class="nivel-para"><%= d.para %></span>
+          <span class="meses">em <%= d.meses %> meses</span>
+        </div>
+        <blockquote><%= d.texto %></blockquote>
+        <figcaption>
+          <strong><%= d.nome %></strong>
+          <span><%= d.perfil %> · <%= d.materia %></span>
+        </figcaption>
+      </figure>
+      <% }) %>
+    </div>
+  </section>
+
+  <!-- ============ PLANOS ============ -->
+  <section class="secao planos" id="planos">
+    <header class="secao-cabecalho">
+      <span class="etiqueta">Planos</span>
+      <h2>Escolha como quer estudar</h2>
+      <p>Todos os planos incluem 7 dias de teste grátis. Sem cartão para começar.</p>
+    </header>
+
+    <div class="grade-planos">
+      <% planos.forEach(function (p) { %>
+      <article class="card-plano<%= p.destaque ? ' destaque' : '' %>">
+        <% if (p.selo) { %><span class="selo-plano"><%= p.selo %></span><% } %>
+        <h3><%= p.nome %></h3>
+        <p class="plano-chamada"><%= p.chamada %></p>
+        <p class="plano-preco">
+          <span class="moeda">R$</span><span class="valor"><%= p.preco.toFixed(2).replace('.', ',') %></span><span class="periodo"><%= p.periodo %></span>
+        </p>
+        <ul class="plano-beneficios">
+          <% p.beneficios.forEach(function (b) { %><li><%= b %></li><% }) %>
+        </ul>
+        <% if (typeof aluno !== 'undefined' && aluno) { %>
+          <form method="post" action="/assinar/<%= p.id %>" class="form-assinar">
+            <button type="submit" class="btn <%= p.destaque ? 'btn-primario' : 'btn-secundario' %> btn-bloco"><%= p.cta %></button>
+          </form>
+        <% } else { %>
+          <a href="/cadastro" class="btn <%= p.destaque ? 'btn-primario' : 'btn-secundario' %> btn-bloco"><%= p.cta %></a>
+        <% } %>
+        <% if (p.id === 'anual') { %>
+        <p class="plano-nota">Cobrança única de R$ <%= (p.preco * 12).toFixed(2).replace('.', ',') %> em até 12x</p>
+        <% } %>
+      </article>
+      <% }) %>
+    </div>
+  </section>
+
+  <!-- ============ CTA FINAL ============ -->
+  <section class="cta-final">
+    <h2>Sua primeira aula com um professor de IA começa hoje</h2>
+    <p>Faça o nivelamento gratuito e descubra em que ponto você realmente está.</p>
+    <a href="/area-do-aluno" class="btn btn-claro btn-grande">Comece grátis</a>
+  </section>
+
+</main>
+
+<%- include('partials/footer') %>

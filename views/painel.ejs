@@ -1,0 +1,130 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+
+<main id="conteudo">
+  <section class="capa-aluno">
+    <span class="etiqueta">Meu painel</span>
+    <h1>Olá, <%= (aluno.nome || aluno.email).split(' ')[0] %></h1>
+    <p>Aqui ficam seu nível em cada matéria, as dúvidas que você já tirou e o atalho
+      para a próxima aula.</p>
+
+    <div class="painel-numeros">
+      <div><strong><%= resumo.materias %></strong><span>matérias niveladas</span></div>
+      <div><strong><%= resumo.nivelamentos %></strong><span>nivelamentos feitos</span></div>
+      <div><strong><%= resumo.duvidas %></strong><span>dúvidas tiradas</span></div>
+    </div>
+  </section>
+
+  <!-- Assinatura -->
+  <section class="secao" style="padding-bottom: 0">
+    <div class="cartao assinatura-atual">
+      <% if (assinatura) { %>
+        <div>
+          <strong><%= assinatura.plano_nome %></strong>
+          <span class="tag tag-<%= assinatura.status %>"><%= assinatura.status %></span>
+          <p class="nota">R$ <%= Number(assinatura.valor).toFixed(2).replace('.', ',') %><% if (assinatura.parcelas > 1) { %> em <%= assinatura.parcelas %>x<% } %>
+            · desde <%= new Date(assinatura.criado_em).toLocaleDateString('pt-BR') %></p>
+        </div>
+        <a href="/#planos" class="btn btn-secundario">Mudar de plano</a>
+      <% } else { %>
+        <div>
+          <strong>Você ainda não tem um plano ativo</strong>
+          <p class="nota">
+            <% if (pagamentos.length && pagamentos[0].status === 'pendente') { %>
+              Há um pagamento aguardando confirmação (<%= pagamentos[0].plano_nome %>).
+            <% } else { %>
+              Assine para liberar todas as matérias e o tira-dúvidas ilimitado.
+            <% } %>
+          </p>
+        </div>
+        <a href="/#planos" class="btn btn-primario">Ver planos</a>
+      <% } %>
+    </div>
+  </section>
+
+  <!-- Trilha do aluno -->
+  <section class="secao">
+    <header class="secao-cabecalho">
+      <span class="etiqueta">Minha trilha</span>
+      <h2>Onde você está em cada matéria</h2>
+    </header>
+
+    <% if (!trilha.length) { %>
+      <div class="cartao vazio">
+        <p>Você ainda não fez nenhum teste de nivelamento. É por ele que a IA descobre
+          o seu ponto de partida.</p>
+        <a href="/area-do-aluno" class="btn btn-primario">Fazer meu primeiro nivelamento</a>
+      </div>
+    <% } else { %>
+      <div class="grade-materias">
+        <% trilha.forEach(function (t) { %>
+        <article class="card-materia" style="--cor-materia: <%= t.materia ? t.materia.cor : '#4f46e5' %>">
+          <div class="card-materia-topo">
+            <span class="card-icone" aria-hidden="true"><%= t.materia ? t.materia.icone : '📘' %></span>
+            <div>
+              <h3><%= t.materia ? t.materia.nome : t.materia_slug %></h3>
+              <p class="card-avatar">nível <%= t.nivel_sugerido %></p>
+            </div>
+          </div>
+
+          <div class="barra" aria-label="Aproveitamento <%= t.aproveitamento %>%">
+            <span style="width: <%= t.aproveitamento %>%"></span>
+          </div>
+          <p class="nivel-descricao"><%= t.aproveitamento %>% de aproveitamento
+            (<%= t.acertos %>/<%= t.total %>)</p>
+          <p class="card-resumo">Último nivelamento em
+            <%= new Date(t.criado_em).toLocaleDateString('pt-BR') %>.</p>
+
+          <a class="card-link" href="/aula/<%= t.materia_slug %>/<%= t.nivel_codigo || 'basico' %>">Continuar aula →</a>
+        </article>
+        <% }) %>
+      </div>
+    <% } %>
+  </section>
+
+  <!-- Últimas dúvidas -->
+  <section class="secao escuro">
+    <header class="secao-cabecalho">
+      <span class="etiqueta">Histórico</span>
+      <h2>Suas últimas dúvidas</h2>
+    </header>
+
+    <% if (!duvidas.length) { %>
+      <p class="centralizar" style="color:#94a3b8">Nenhuma dúvida ainda. Abra uma aula e
+        pergunte o que quiser ao avatar — tudo fica registrado aqui.</p>
+    <% } else { %>
+      <ul class="lista-duvidas">
+        <% duvidas.forEach(function (d) { %>
+        <li>
+          <span class="duvida-materia"><%= d.materia ? d.materia.icone + ' ' + d.materia.nome : d.materia_slug %></span>
+          <p><%= d.pergunta %></p>
+          <span class="duvida-data"><%= new Date(d.criado_em).toLocaleString('pt-BR') %></span>
+        </li>
+        <% }) %>
+      </ul>
+    <% } %>
+
+    <div class="centralizar">
+      <a href="/area-do-aluno" class="btn btn-claro">Fazer novo nivelamento</a>
+    </div>
+  </section>
+
+  <!-- Todas as matérias -->
+  <section class="secao">
+    <header class="secao-cabecalho">
+      <span class="etiqueta">Catálogo</span>
+      <h2>Todas as matérias</h2>
+    </header>
+    <div class="grade-materias compacta">
+      <% materias.forEach(function (m) { %>
+      <a class="card-materia mini" href="/materias/<%= m.slug %>" style="--cor-materia: <%= m.cor %>">
+        <span class="card-icone" aria-hidden="true"><%= m.icone %></span>
+        <h3><%= m.nome %></h3>
+        <p class="card-avatar">com <%= m.avatar %></p>
+      </a>
+      <% }) %>
+    </div>
+  </section>
+</main>
+
+<%- include('partials/footer') %>

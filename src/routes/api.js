@@ -1,0 +1,139 @@
+import { Router } from 'express';
+import {
+  listarMaterias,
+  buscarMateria,
+  listarPlanos,
+  registrarDuvida,
+  registrarNivelamento,
+  estatisticas,
+  origemDados,
+  carregarConteudo
+} from '../repositories/conteudo.js';
+import { verificarConexao } from '../db/pool.js';
+import { modoPagamento, pagamentoConfigurado } from '../services/pagamento.js';
+import { sintetizar, modoVoz } from '../services/voz.js';
+import { responderDuvida, nivelar, gerarAvatar, modo } from '../services/ia.js';
+
+const router = Router();
+
+router.get('/status', async (req, res) => {
+  const [materias, planos, banco, numeros] = await Promise.all([
+    listarMaterias(),
+    listarPlanos(),
+    verificarConexao(),
+    estatisticas()
+  ]);
+
+  res.json({
+    ok: true,
+    modo,
+    pagamento: { configurado: pagamentoConfigurado, modo: modoPagamento },
+    voz: { modo: modoVoz },
+    banco: { conectado: banco.ok, versao: banco.versao ?? null, motivo: banco.motivo ?? null },
+    origemConteudo: origemDados(),
+    materias: materias.length,
+    planos: planos.length,
+    registros: numeros
+  });
+});
+
+router.get('/materias', async (req, res) => {
+  res.json({ materias: await listarMaterias() });
+});
+
+router.get('/materias/:slug', async (req, res) => {
+  const materia = await buscarMateria(req.params.slug);
+  if (!materia) return res.status(404).json({ erro: 'Matéria não encontrada.' });
+  res.json({ materia });
+});
+
+router.get('/planos', async (req, res) => {
+  res.json({ planos: await listarPlanos() });
+});
+
+// Recarrega o cache de conteudo depois de uma alteracao no banco.
+router.post('/conteudo/recarregar', async (req, res) => {
+  await carregarConteudo();
+  res.json({ ok: true, origem: origemDados() });
+});
+
+// Assistente de duvidas da aula (barra lateral). Toda pergunta e persistida.
+router.post('/chat', async (req, res, next) => {
+  try {
+    const { pergunta, materia, nivel, topico } = req.body ?? {};
+    if (!pergunta || !String(pergunta).trim()) {
+      return res.status(400).json({ erro: 'Envie uma pergunta.' });
+    }
+
+    const resultado = await responderDuvida({
+      pergunta: String(pergunta),
+      materiaSlug: materia,
+      nivelId: nivel,
+      topico
+    });
+
+    await registrarDuvida({
+      alunoId: req.aluno?.id ?? null,
+      materiaSlug: materia,
+      nivelCodigo: nivel,
+      topico,
+      pergunta: String(pergunta),
+      resposta: resultado.resposta,
+      modo: resultado.modo
+    });
+
+    res.json(resultado);
+  } catch (erro) {
+    next(erro);
+  }
+});
+
+// Teste de nivelamento -> posicao inicial na trilha adaptativa.
+router.post('/nivelamento', async (req, res, next) => {
+  try {
+    const { materia, acertos, total } = req.body ?? {};
+    const resultado = await nivelar({
+      materiaSlug: materia,
+      acertos: Number(acertos) || 0,
+      total: Number(total) || 10
+    });
+    if (!resultado) return res.status(404).json({ erro: 'Matéria não encontrada.' });
+
+    await registrarNivelamento({
+      alunoId: req.aluno?.id ?? null,
+      materiaSlug: materia,
+      acertos: Number(acertos) || 0,
+      total: Number(total) || 10,
+      aproveitamento: resultado.aproveitamento,
+      nivelSugerido: resultado.nivelSugerido,
+      nivelCodigo: resultado.nivelId
+    });
+
+    res.json(resultado);
+  } catch (erro) {
+    next(erro);
+  }
+});
+
+// Voz do professor avatar: texto + preset (navegador) ou audio pronto (provedor).
+router.post('/voz', async (req, res, next) => {
+  try {
+    const { texto, materia, idioma } = req.body ?? {};
+    res.json(await sintetizar({ texto, materiaSlug: materia, idioma }));
+  } catch (erro) {
+    if (erro.codigo === 'TEXTO_VAZIO') return res.status(400).json({ erro: erro.message });
+    next(erro);
+  }
+});
+
+// Renderizacao do professor avatar para um roteiro de aula.
+router.post('/avatar', async (req, res, next) => {
+  try {
+    const { materia, nivel, roteiro } = req.body ?? {};
+    res.json(await gerarAvatar({ materia, nivel, roteiro }));
+  } catch (erro) {
+    next(erro);
+  }
+});
+
+export default router;

@@ -1,0 +1,34 @@
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+
+<header class="cabecalho" id="cabecalho">
+  <a class="logo" href="/">
+    <span class="logo-marca">EducaAI</span>
+    <span class="logo-icone" aria-hidden="true">🚀</span>
+  </a>
+
+  <button class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="menu" aria-label="Abrir menu">
+    <span></span><span></span><span></span>
+  </button>
+
+  <nav class="menu" id="menu">
+    <a href="/#inicio" class="<%= pagina === 'inicio' ? 'ativo' : '' %>">Início</a>
+    <a href="/#materias">Matérias</a>
+    <a href="/#como-funciona">Como Funciona</a>
+    <a href="/#planos">Planos</a>
+
+    <% if (typeof aluno !== 'undefined' && aluno) { %>
+      <a href="/painel" class="<%= pagina === 'painel' ? 'ativo' : '' %>">Meu painel</a>
+      <span class="usuario" title="<%= aluno.email %>">
+        <span class="usuario-inicial" aria-hidden="true"><%= (aluno.nome || aluno.email).trim().charAt(0).toUpperCase() %></span>
+        <%= (aluno.nome || aluno.email).split(' ')[0] %>
+      </span>
+      <form action="/logout" method="post" class="form-sair">
+        <button type="submit" class="btn btn-secundario">Sair</button>
+      </form>
+    <% } else { %>
+      <a href="/area-do-aluno" class="<%= pagina === 'area' ? 'ativo' : '' %>">Área do Aluno</a>
+      <a href="/login" class="<%= pagina === 'login' ? 'ativo' : '' %>">Entrar</a>
+      <a href="/cadastro" class="btn btn-primario">Criar conta</a>
+    <% } %>
+  </nav>
+</header>

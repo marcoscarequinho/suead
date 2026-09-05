@@ -1,0 +1,53 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+
+<main id="conteudo" class="pagina-conta">
+  <section class="retorno">
+    <div class="cartao retorno-cartao estado-<%= estado %>">
+      <span class="retorno-icone" aria-hidden="true">
+        <%= estado === 'sucesso' ? '✅' : estado === 'falha' ? '⚠️' : '⏳' %>
+      </span>
+
+      <h1>
+        <%= estado === 'sucesso' ? 'Assinatura confirmada'
+          : estado === 'falha' ? 'Pagamento não aprovado'
+          : estado === 'erro' ? 'Pagamento indisponível'
+          : 'Aguardando confirmação' %>
+      </h1>
+
+      <p class="retorno-mensagem"><%= mensagem %></p>
+
+      <% if (assinatura) { %>
+      <dl class="retorno-dados">
+        <div><dt>Plano</dt><dd><%= assinatura.plano_nome %></dd></div>
+        <div>
+          <dt>Valor</dt>
+          <dd>
+            R$ <%= Number(assinatura.valor).toFixed(2).replace('.', ',') %>
+            <% if (assinatura.parcelas > 1) { %>em <%= assinatura.parcelas %>x<% } %>
+          </dd>
+        </div>
+        <div><dt>Situação</dt><dd class="tag tag-<%= assinatura.status %>"><%= assinatura.status %></dd></div>
+        <% if (assinatura.meio_pagamento) { %>
+        <div><dt>Meio</dt><dd><%= assinatura.meio_pagamento %></dd></div>
+        <% } %>
+        <div><dt>Referência</dt><dd class="mono"><%= assinatura.referencia %></dd></div>
+      </dl>
+      <% } %>
+
+      <div class="hero-acoes retorno-acoes">
+        <% if (estado === 'sucesso') { %>
+          <a href="/painel" class="btn btn-primario btn-grande">Ir para o meu painel</a>
+        <% } else if (estado === 'falha') { %>
+          <a href="/#planos" class="btn btn-primario btn-grande">Tentar outro meio</a>
+          <a href="/painel" class="btn btn-secundario btn-grande">Voltar ao painel</a>
+        <% } else { %>
+          <a href="/painel" class="btn btn-primario btn-grande">Voltar ao painel</a>
+          <a href="/#planos" class="btn btn-secundario btn-grande">Ver planos</a>
+        <% } %>
+      </div>
+    </div>
+  </section>
+</main>
+
+<%- include('partials/footer') %>

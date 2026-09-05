@@ -1,0 +1,59 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+
+<main id="conteudo">
+  <section class="capa-materia" style="--cor-materia: <%= materia.cor %>">
+    <nav class="migalhas"><a href="/">Início</a> <span>/</span> <a href="/#materias">Matérias</a> <span>/</span> <%= materia.nome %></nav>
+    <span class="capa-icone" aria-hidden="true"><%= materia.icone %></span>
+    <h1><%= materia.nome %> do básico ao avançado</h1>
+    <p><%= materia.resumo %></p>
+    <p class="capa-avatar">Professor avatar: <strong><%= materia.avatar %></strong></p>
+    <div class="hero-acoes">
+      <a href="/aula/<%= materia.slug %>/basico" class="btn btn-claro btn-grande">Assistir aula demonstrativa</a>
+      <a href="/area-do-aluno" class="btn btn-contorno btn-grande">Fazer nivelamento</a>
+    </div>
+  </section>
+
+  <section class="secao">
+    <header class="secao-cabecalho">
+      <span class="etiqueta">Trilha</span>
+      <h2>Três níveis, uma sequência</h2>
+      <p>Você entra no nível indicado pelo teste de nivelamento e avança conforme as avaliações.</p>
+    </header>
+
+    <div class="trilha">
+      <% materia.niveis.forEach(function (nivel, i) { %>
+      <article class="trilha-nivel" style="--cor-materia: <%= materia.cor %>">
+        <div class="trilha-marcador"><%= i + 1 %></div>
+        <div class="trilha-conteudo">
+          <h3><%= nivel.nome %></h3>
+          <p class="nivel-descricao"><%= nivel.descricao %></p>
+          <ul class="nivel-topicos">
+            <% nivel.topicos.forEach(function (t) { %><li><%= t %></li><% }) %>
+          </ul>
+          <p class="nivel-duracao"><%= nivel.duracao %></p>
+          <a class="card-link" href="/aula/<%= materia.slug %>/<%= nivel.id %>">Abrir sala de aula →</a>
+        </div>
+      </article>
+      <% }) %>
+    </div>
+  </section>
+
+  <section class="secao escuro">
+    <header class="secao-cabecalho">
+      <span class="etiqueta">Outras matérias</span>
+      <h2>Continue montando sua grade</h2>
+    </header>
+    <div class="grade-materias compacta">
+      <% materias.filter(function (m) { return m.slug !== materia.slug; }).forEach(function (m) { %>
+      <a class="card-materia mini" href="/materias/<%= m.slug %>" style="--cor-materia: <%= m.cor %>">
+        <span class="card-icone" aria-hidden="true"><%= m.icone %></span>
+        <h3><%= m.nome %></h3>
+        <p class="card-avatar">com <%= m.avatar %></p>
+      </a>
+      <% }) %>
+    </div>
+  </section>
+</main>
+
+<%- include('partials/footer') %>

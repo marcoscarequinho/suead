@@ -1,0 +1,61 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+
+<main id="conteudo" class="pagina-conta">
+  <section class="conta-grade">
+    <div class="conta-formulario">
+      <span class="etiqueta">Criar conta</span>
+      <h1>Comece grátis hoje</h1>
+      <p class="conta-sub">Sete dias de acesso completo. Sem cartão de crédito.</p>
+
+      <% if (erros.length) { %>
+      <div class="alerta" role="alert">
+        <ul>
+          <% erros.forEach(function (e) { %><li><%= e %></li><% }) %>
+        </ul>
+      </div>
+      <% } %>
+
+      <form method="post" action="/cadastro" class="formulario" novalidate>
+        <label for="nome">Nome</label>
+        <input type="text" id="nome" name="nome" autocomplete="name" required
+               value="<%= valores.nome || '' %>" placeholder="Como podemos te chamar?">
+
+        <label for="email">E-mail</label>
+        <input type="email" id="email" name="email" autocomplete="email" required
+               value="<%= valores.email || '' %>" placeholder="voce@email.com">
+
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" name="senha" autocomplete="new-password" required
+               minlength="8" placeholder="Mínimo 8 caracteres, com letras e números">
+
+        <label for="confirmacao">Confirme a senha</label>
+        <input type="password" id="confirmacao" name="confirmacao" autocomplete="new-password" required
+               minlength="8" placeholder="Repita a senha">
+
+        <button type="submit" class="btn btn-primario btn-bloco btn-grande">Criar minha conta</button>
+      </form>
+
+      <p class="conta-troca">Já tem conta? <a href="/login">Entrar</a></p>
+    </div>
+
+    <aside class="conta-lateral">
+      <h2>O que você leva ao criar a conta</h2>
+      <ul class="lista-conferida">
+        <li>Teste de nivelamento em todas as matérias</li>
+        <li>Trilha adaptativa salva no seu perfil</li>
+        <li>Histórico das dúvidas tiradas com o avatar</li>
+        <li>Retomar a aula exatamente de onde parou</li>
+      </ul>
+      <div class="conta-avatar">
+        <div class="avatar-circulo">
+          <span class="avatar-face">👩‍🏫</span>
+          <span class="onda"></span>
+        </div>
+        <p>Seu professor de IA já está esperando.</p>
+      </div>
+    </aside>
+  </section>
+</main>
+
+<%- include('partials/footer') %>

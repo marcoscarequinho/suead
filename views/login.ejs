@@ -1,0 +1,53 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+
+<main id="conteudo" class="pagina-conta">
+  <section class="conta-grade">
+    <div class="conta-formulario">
+      <span class="etiqueta">Entrar</span>
+      <h1>Bem-vindo de volta</h1>
+      <p class="conta-sub">Sua trilha continua exatamente de onde você parou.</p>
+
+      <% if (erros.length) { %>
+      <div class="alerta" role="alert">
+        <ul>
+          <% erros.forEach(function (e) { %><li><%= e %></li><% }) %>
+        </ul>
+      </div>
+      <% } %>
+
+      <form method="post" action="/login" class="formulario" novalidate>
+        <label for="email">E-mail</label>
+        <input type="email" id="email" name="email" autocomplete="email" required
+               value="<%= valores.email || '' %>" placeholder="voce@email.com">
+
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" name="senha" autocomplete="current-password" required
+               placeholder="Sua senha">
+
+        <button type="submit" class="btn btn-primario btn-bloco btn-grande">Entrar</button>
+      </form>
+
+      <p class="conta-troca">Ainda não tem conta? <a href="/cadastro">Criar conta grátis</a></p>
+    </div>
+
+    <aside class="conta-lateral">
+      <h2>Dentro da sua conta</h2>
+      <ul class="lista-conferida">
+        <li>Nível atual em cada matéria</li>
+        <li>Histórico de nivelamentos</li>
+        <li>Últimas dúvidas tiradas com o avatar</li>
+        <li>Atalho para a próxima aula</li>
+      </ul>
+      <div class="conta-avatar">
+        <div class="avatar-circulo">
+          <span class="avatar-face">🤖</span>
+          <span class="onda"></span>
+        </div>
+        <p>Tira-dúvidas disponível 24 horas por dia.</p>
+      </div>
+    </aside>
+  </section>
+</main>
+
+<%- include('partials/footer') %>

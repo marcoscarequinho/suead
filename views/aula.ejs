@@ -1,0 +1,109 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+
+<main id="conteudo" class="pagina-aula" style="--cor-materia: <%= materia.cor %>">
+
+  <div class="aula-grade">
+    <!-- Palco do avatar -->
+    <section class="aula-palco">
+      <nav class="migalhas"><a href="/materias/<%= materia.slug %>"><%= materia.nome %></a> <span>/</span> <%= nivel.nome %></nav>
+
+      <div class="palco">
+        <div class="palco-topo">
+          <span class="ponto ao-vivo"></span>
+          <strong><%= materia.avatar %></strong> · <%= materia.nome %> · <%= nivel.nome %>
+          <button type="button" class="som-btn" id="som-btn" aria-pressed="true"
+                  aria-label="Ligar ou desligar a voz do professor">
+            <span class="som-icone" aria-hidden="true">🔊</span>
+            <span class="som-texto">Voz ligada</span>
+          </button>
+        </div>
+
+        <div class="palco-video" id="palco-video">
+          <div class="avatar-circulo grande">
+            <span class="avatar-face"><%= materia.icone %></span>
+            <span class="onda"></span>
+            <span class="onda onda-2"></span>
+          </div>
+          <p class="legenda" id="legenda-aula"><%= nivel.topicos[0] %> — vamos começar por aqui.</p>
+          <p class="palco-aviso" id="palco-aviso">Modo demonstrativo: o vídeo do avatar é renderizado por
+            <code>POST /api/avatar</code> quando a chave do provedor estiver configurada.</p>
+        </div>
+
+        <div class="palco-controles">
+          <button type="button" class="btn btn-primario" id="btn-ouvir"
+                  data-texto="<%= nivel.descricao %> Nesta aula vamos ver <%= nivel.topicos.join(', ') %>.">
+            ▶ Ouvir a explicação
+          </button>
+          <button type="button" class="btn btn-secundario" id="btn-repetir">↺ Explicar de novo</button>
+          <button type="button" class="btn btn-secundario" id="btn-devagar">🐢 Mais devagar</button>
+          <button type="button" class="btn btn-secundario" id="btn-exemplo">💡 Outro exemplo</button>
+        </div>
+      </div>
+
+      <% if (materia.idioma && nivel.expressoes && nivel.expressoes.length) { %>
+      <div class="aula-topicos pronuncia" data-idioma="<%= materia.idioma %>">
+        <h2>Pronúncia — ouça <%= materia.avatar %> falando</h2>
+        <p class="nota">Clique em cada frase para ouvi-la em <%= materia.nome %>.</p>
+        <ul class="lista-pronuncia">
+          <% nivel.expressoes.forEach(function (e) { %>
+          <li>
+            <button type="button" class="frase-btn" data-frase="<%= e.frase %>">
+              <span class="frase-som" aria-hidden="true">🔊</span>
+              <span class="frase-texto"><%= e.frase %></span>
+            </button>
+            <span class="frase-traducao"><%= e.traducao %></span>
+          </li>
+          <% }) %>
+        </ul>
+      </div>
+      <% } %>
+
+      <div class="aula-topicos">
+        <h2>Roteiro deste nível</h2>
+        <ol>
+          <% nivel.topicos.forEach(function (t, i) { %>
+          <li class="<%= i === 0 ? 'atual' : '' %>"><%= t %></li>
+          <% }) %>
+        </ol>
+        <p class="nivel-duracao"><%= nivel.duracao %></p>
+      </div>
+    </section>
+
+    <!-- Barra lateral de dúvidas -->
+    <aside class="aula-chat" aria-label="Tira-dúvidas com o professor de IA">
+      <header class="chat-topo">
+        <h2>Tira-dúvidas</h2>
+        <span class="chat-status">online 24/7</span>
+      </header>
+
+      <div class="chat-mensagens" id="chat-mensagens" aria-live="polite">
+        <div class="balao professor">
+          Oi! Sou <%= materia.avatar %>. Pergunte qualquer coisa sobre
+          <strong><%= nivel.topicos[0].toLowerCase() %></strong> — respondo com o contexto desta aula.
+        </div>
+      </div>
+
+      <div class="chat-sugestoes" id="chat-sugestoes">
+        <button type="button" data-sugestao="Explique de novo, mais devagar">Explique de novo</button>
+        <button type="button" data-sugestao="Me dê um exercício para treinar">Quero um exercício</button>
+        <button type="button" data-sugestao="Onde eu costumo errar nisso?">Onde eu erro?</button>
+      </div>
+
+      <form class="chat-form" id="chat-form"
+            data-materia="<%= materia.slug %>"
+            data-nivel="<%= nivel.id %>"
+            data-topico="<%= nivel.topicos[0] %>">
+        <label class="sr-only" for="chat-input">Sua dúvida</label>
+        <input id="chat-input" name="pergunta" type="text" autocomplete="off"
+               placeholder="Digite ou fale sua dúvida..." required>
+        <button type="button" class="btn btn-secundario btn-mic" id="btn-mic"
+                aria-label="Perguntar por voz" title="Perguntar por voz">🎙️</button>
+        <button type="submit" class="btn btn-primario" aria-label="Enviar">➤</button>
+      </form>
+      <p class="chat-aviso" id="chat-aviso" hidden></p>
+    </aside>
+  </div>
+</main>
+
+<%- include('partials/footer') %>
