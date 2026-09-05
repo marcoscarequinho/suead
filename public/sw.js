@@ -5,7 +5,7 @@
  * que abrisse o app no mesmo aparelho. Cache aqui e so para estatico.
  */
 
-const VERSAO = 'educaai-v1';
+const VERSAO = 'educaai-v2';
 const ESTATICOS = [
   '/offline.html',
   '/css/style.css',
@@ -58,8 +58,29 @@ self.addEventListener('fetch', (evento) => {
     return;
   }
 
-  // Estatico: responde do cache e revalida em segundo plano.
-  if (/^\/(css|js|icons)\//.test(url.pathname)) {
+  // CSS e JS: rede primeiro. Os arquivos nao tem hash no nome, entao servir a
+  // copia do cache faria a pagina recem-publicada rodar com o estilo antigo.
+  // O cache fica so como rede de seguranca para quando nao houver conexao.
+  if (/^\/(css|js)\//.test(url.pathname)) {
+    evento.respondWith(
+      fetch(requisicao)
+        .then((resposta) => {
+          if (resposta.ok) {
+            const copia = resposta.clone();
+            caches.open(VERSAO).then((cache) => cache.put(requisicao, copia));
+          }
+          return resposta;
+        })
+        .catch(async () => {
+          const guardado = await caches.match(requisicao);
+          return guardado || new Response('', { status: 504, statusText: 'Sem conexão' });
+        })
+    );
+    return;
+  }
+
+  // Icones: cache primeiro, revalidando em segundo plano. Mudam de raro a nunca.
+  if (url.pathname.startsWith('/icons/')) {
     evento.respondWith(
       caches.open(VERSAO).then(async (cache) => {
         const guardado = await cache.match(requisicao);

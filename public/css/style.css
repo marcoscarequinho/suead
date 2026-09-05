@@ -113,6 +113,17 @@ img { max-width: 100%; display: block; }
   background: linear-gradient(135deg, #eef2ff 0%, #e0f2fe 55%, #cffafe 100%);
 }
 
+/* Assinatura do parceiro, acima do selo do hero. */
+.iniciativa {
+  margin-bottom: .55rem;
+  font-size: .76rem; font-weight: 800; letter-spacing: .06em;
+  text-transform: uppercase; color: #dc2626;
+}
+.iniciativa a {
+  color: #dc2626; text-decoration: underline; text-underline-offset: 3px;
+}
+.iniciativa a:hover { color: #991b1b; }
+
 .selo {
   display: inline-block; margin-bottom: 1.2rem;
   padding: .4rem .9rem; border-radius: 999px;
