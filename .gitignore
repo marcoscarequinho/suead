@@ -1,5 +1,11 @@
 node_modules/
-.env
 npm-debug.log*
 .DS_Store
+
+# Variáveis de ambiente (o .env.example fica versionado de propósito)
+.env
+.env.*
+!.env.example
+
+# Vercel
 .vercel
