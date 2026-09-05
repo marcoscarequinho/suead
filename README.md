@@ -1,0 +1,2 @@
+# suead
+Cursos com ia
