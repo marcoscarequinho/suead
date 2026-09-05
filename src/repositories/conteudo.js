@@ -99,7 +99,7 @@ async function lerMaterias() {
 async function lerPlanos() {
   const { rows } = await pool.query(
     `select codigo as id, nome, preco::float8 as preco, periodo, chamada,
-            destaque, selo, beneficios, cta
+            destaque, selo, beneficios, cta, nivel
        from planos order by ordem, id`
   );
   return rows;

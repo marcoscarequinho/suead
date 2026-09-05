@@ -362,4 +362,40 @@
       cartao.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
   }
+  /* ---------- App instalavel ---------- */
+  // O service worker so cuida de estatico e da tela offline; nenhuma pagina
+  // com sessao vai para o cache (ver public/sw.js).
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("/sw.js").catch((erro) => {
+        console.warn("[pwa] service worker não registrado:", erro.message);
+      });
+    });
+  }
+
+  // O Chrome/Edge guarda o convite de instalacao: seguramos o evento e
+  // mostramos nosso proprio botao no cabecalho.
+  const btnInstalar = document.getElementById("btn-instalar");
+  let convite = null;
+
+  window.addEventListener("beforeinstallprompt", (evento) => {
+    evento.preventDefault();
+    convite = evento;
+    if (btnInstalar) btnInstalar.hidden = false;
+  });
+
+  if (btnInstalar) {
+    btnInstalar.addEventListener("click", async () => {
+      if (!convite) return;
+      convite.prompt();
+      await convite.userChoice;
+      convite = null;
+      btnInstalar.hidden = true;
+    });
+  }
+
+  window.addEventListener("appinstalled", () => {
+    convite = null;
+    if (btnInstalar) btnInstalar.hidden = true;
+  });
 })();

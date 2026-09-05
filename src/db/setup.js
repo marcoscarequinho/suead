@@ -79,14 +79,15 @@ async function main() {
     // ----- Planos -----
     for (const [i, p] of planos.entries()) {
       await cliente.query(
-        `insert into planos (codigo, nome, preco, periodo, chamada, destaque, selo, beneficios, cta, ordem)
-         values ($1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9, $10)
+        `insert into planos (codigo, nome, preco, periodo, chamada, destaque, selo, beneficios, cta, ordem, nivel)
+         values ($1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9, $10, $11)
          on conflict (codigo) do update set
            nome = excluded.nome, preco = excluded.preco, periodo = excluded.periodo,
            chamada = excluded.chamada, destaque = excluded.destaque, selo = excluded.selo,
-           beneficios = excluded.beneficios, cta = excluded.cta, ordem = excluded.ordem`,
+           beneficios = excluded.beneficios, cta = excluded.cta, ordem = excluded.ordem,
+           nivel = excluded.nivel`,
         [p.id, p.nome, p.preco, p.periodo, p.chamada, p.destaque, p.selo ?? null,
-         JSON.stringify(p.beneficios), p.cta, i]
+         JSON.stringify(p.beneficios), p.cta, i, p.nivel ?? 0]
       );
     }
     console.log(`Planos sincronizados: ${planos.length}`);

@@ -52,6 +52,7 @@ create table if not exists planos (
   cta         text not null,
   ordem       integer not null default 0
 );
+alter table planos add column if not exists nivel integer not null default 0;
 
 create table if not exists depoimentos (
   id          serial primary key,
@@ -134,7 +135,7 @@ create table if not exists assinaturas (
   valor          numeric(10,2) not null,
   parcelas       integer not null default 1,
   ciclo          text not null default 'mensal',      -- mensal | anual
-  status         text not null default 'pendente',    -- pendente | ativa | recusada | cancelada
+  status         text not null default 'pendente',    -- pendente | ativa | recusada | cancelada | trocada
   referencia     text not null unique,                -- external_reference enviado ao gateway
   preference_id  text,
   pagamento_id   text,

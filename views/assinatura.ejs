@@ -5,13 +5,14 @@
   <section class="retorno">
     <div class="cartao retorno-cartao estado-<%= estado %>">
       <span class="retorno-icone" aria-hidden="true">
-        <%= estado === 'sucesso' ? '✅' : estado === 'falha' ? '⚠️' : '⏳' %>
+        <%= estado === 'sucesso' ? '✅' : estado === 'falha' ? '⚠️' : estado === 'atual' ? 'ℹ️' : '⏳' %>
       </span>
 
       <h1>
         <%= estado === 'sucesso' ? 'Assinatura confirmada'
           : estado === 'falha' ? 'Pagamento não aprovado'
           : estado === 'erro' ? 'Pagamento indisponível'
+          : estado === 'atual' ? 'Este já é o seu plano'
           : 'Aguardando confirmação' %>
       </h1>
 

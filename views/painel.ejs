@@ -25,7 +25,7 @@
           <p class="nota">R$ <%= Number(assinatura.valor).toFixed(2).replace('.', ',') %><% if (assinatura.parcelas > 1) { %> em <%= assinatura.parcelas %>x<% } %>
             · desde <%= new Date(assinatura.criado_em).toLocaleDateString('pt-BR') %></p>
         </div>
-        <a href="/#planos" class="btn btn-secundario">Mudar de plano</a>
+        <a href="/#planos" class="btn btn-secundario">Fazer upgrade ou downgrade</a>
       <% } else { %>
         <div>
           <strong>Você ainda não tem um plano ativo</strong>

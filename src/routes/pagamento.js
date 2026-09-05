@@ -5,7 +5,8 @@ import { listarPlanos } from '../repositories/conteudo.js';
 import {
   criarAssinatura,
   buscarPorReferencia,
-  atualizarPorReferencia
+  atualizarPorReferencia,
+  assinaturaAtiva
 } from '../repositories/assinaturas.js';
 import {
   criarPreferencia,
@@ -28,6 +29,20 @@ router.post('/assinar/:plano', exigirLogin, async (req, res, next) => {
     const planos = await listarPlanos();
     const plano = planos.find((p) => p.id === req.params.plano);
     if (!plano) return res.status(404).redirect('/#planos');
+
+    // Reassinar o plano que ja esta ativo so geraria cobranca duplicada.
+    // Upgrade e downgrade continuam liberados: sao outro plano_codigo.
+    const ativa = await assinaturaAtiva(req.aluno.id);
+    if (ativa && ativa.plano_codigo === plano.id) {
+      return res.status(409).render('assinatura', {
+        titulo: 'Você já assina este plano — EducaAI',
+        descricao: 'Este já é o seu plano atual.',
+        pagina: 'assinatura',
+        estado: 'atual',
+        mensagem: `O plano ${plano.nome} já é o seu plano atual. Escolha outro na grade para fazer upgrade ou downgrade.`,
+        assinatura: ativa
+      });
+    }
 
     if (!pagamentoConfigurado) {
       return res.status(503).render('assinatura', {

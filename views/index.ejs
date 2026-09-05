@@ -175,13 +175,23 @@
     <header class="secao-cabecalho">
       <span class="etiqueta">Planos</span>
       <h2>Escolha como quer estudar</h2>
-      <p>Todos os planos incluem 7 dias de teste grátis. Sem cartão para começar.</p>
+      <% if (typeof assinatura !== "undefined" && assinatura) { %>
+        <p class="planos-aviso">Seu plano atual é <strong><%= assinatura.plano_nome %></strong>.
+          Escolha outro cartão para fazer upgrade ou downgrade — a troca passa pelo
+          checkout e substitui o plano de hoje.</p>
+      <% } else { %>
+        <p>Todos os planos incluem 7 dias de teste grátis. Sem cartão para começar.</p>
+      <% } %>
     </header>
 
     <div class="grade-planos">
       <% planos.forEach(function (p) { %>
-      <article class="card-plano<%= p.destaque ? ' destaque' : '' %>">
-        <% if (p.selo) { %><span class="selo-plano"><%= p.selo %></span><% } %>
+      <article class="card-plano<%= p.destaque ? ' destaque' : '' %><%= p.atual ? ' atual' : '' %>"<% if (p.atual) { %> aria-current="true"<% } %>>
+        <% if (p.atual) { %>
+          <span class="selo-plano selo-atual">✓ Seu plano</span>
+        <% } else if (p.selo) { %>
+          <span class="selo-plano"><%= p.selo %></span>
+        <% } %>
         <h3><%= p.nome %></h3>
         <p class="plano-chamada"><%= p.chamada %></p>
         <p class="plano-preco">
@@ -190,12 +200,18 @@
         <ul class="plano-beneficios">
           <% p.beneficios.forEach(function (b) { %><li><%= b %></li><% }) %>
         </ul>
-        <% if (typeof aluno !== 'undefined' && aluno) { %>
-          <form method="post" action="/assinar/<%= p.id %>" class="form-assinar">
-            <button type="submit" class="btn <%= p.destaque ? 'btn-primario' : 'btn-secundario' %> btn-bloco"><%= p.cta %></button>
-          </form>
+        <% if (p.diferenca) { %>
+        <p class="plano-troca <%= p.relacao %>"><%= p.diferenca > 0 ? '+' : '−' %>R$ <%= Math.abs(p.diferenca).toFixed(2).replace('.', ',') %>/mês em relação ao seu plano</p>
+        <% } %>
+
+        <% if (typeof aluno === 'undefined' || !aluno) { %>
+          <a href="/cadastro" class="btn <%= p.destaque ? 'btn-primario' : 'btn-secundario' %> btn-bloco"><%= p.rotulo %></a>
+        <% } else if (p.atual) { %>
+          <button type="button" class="btn btn-plano-atual btn-bloco" disabled>Seu plano atual</button>
         <% } else { %>
-          <a href="/cadastro" class="btn <%= p.destaque ? 'btn-primario' : 'btn-secundario' %> btn-bloco"><%= p.cta %></a>
+          <form method="post" action="/assinar/<%= p.id %>" class="form-assinar">
+            <button type="submit" class="btn <%= p.relacao === 'upgrade' || (p.destaque && p.relacao === 'nenhuma') ? 'btn-primario' : 'btn-secundario' %> btn-bloco"><%= p.rotulo %></button>
+          </form>
         <% } %>
         <% if (p.id === 'anual') { %>
         <p class="plano-nota">Cobrança única de R$ <%= (p.preco * 12).toFixed(2).replace('.', ',') %> em até 12x</p>

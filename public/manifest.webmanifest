@@ -1,0 +1,24 @@
+{
+  "name": "EducaAI — Cursos EAD com professores avatares de IA",
+  "short_name": "EducaAI",
+  "description": "Exatas, humanas, idiomas e cursos técnicos do básico ao avançado, com professores avatares de inteligência artificial e tira-dúvidas 24/7.",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f8fafc",
+  "theme_color": "#4f46e5",
+  "categories": ["education"],
+  "icons": [
+    { "src": "/icons/icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icone-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Meu painel", "short_name": "Painel", "url": "/painel" },
+    { "name": "Área do aluno", "short_name": "Nivelamento", "url": "/area-do-aluno" },
+    { "name": "Planos", "short_name": "Planos", "url": "/#planos" }
+  ]
+}

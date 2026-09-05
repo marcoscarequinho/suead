@@ -23,6 +23,22 @@ export async function buscarPorReferencia(referencia) {
   return rows[0] ?? null;
 }
 
+/**
+ * Encerra as outras assinaturas ativas do aluno quando uma nova e aprovada.
+ *
+ * Sem isso, um upgrade deixaria duas linhas 'ativa' no banco e o painel passaria
+ * a depender da ordem de criacao para saber qual vale. As antigas viram
+ * 'trocada' — status separado de 'cancelada', que e cancelamento de verdade.
+ */
+async function encerrarOutrasAtivas(cliente, alunoId, referenciaAtual) {
+  const { rowCount } = await cliente.query(
+    `update assinaturas set status = 'trocada', atualizado_em = now()
+      where aluno_id = $1 and status = 'ativa' and referencia <> $2`,
+    [alunoId, referenciaAtual]
+  );
+  if (rowCount) console.log(`[assinatura] ${rowCount} anterior(es) marcada(s) como trocada (aluno ${alunoId})`);
+}
+
 export async function atualizarPorReferencia(referencia, { status, pagamentoId, meioPagamento, detalhe }) {
   if (!temBanco) return null;
   const { rows } = await pool.query(
@@ -37,7 +53,12 @@ export async function atualizarPorReferencia(referencia, { status, pagamentoId, 
     [referencia, status ?? null, pagamentoId ?? null, meioPagamento ?? null,
      detalhe ? JSON.stringify(detalhe) : null]
   );
-  return rows[0] ?? null;
+
+  const assinatura = rows[0] ?? null;
+  if (assinatura?.status === 'ativa') {
+    await encerrarOutrasAtivas(pool, assinatura.aluno_id, assinatura.referencia);
+  }
+  return assinatura;
 }
 
 /**

@@ -16,6 +16,11 @@
     <a href="/#como-funciona">Como Funciona</a>
     <a href="/#planos">Planos</a>
 
+    <%# Aparece so quando o navegador oferece a instalacao (ver main.js). %>
+    <button type="button" class="btn btn-secundario btn-instalar" id="btn-instalar" hidden>
+      <span aria-hidden="true">⬇</span> Instalar app
+    </button>
+
     <% if (typeof aluno !== 'undefined' && aluno) { %>
       <a href="/painel" class="<%= pagina === 'painel' ? 'ativo' : '' %>">Meu painel</a>
       <span class="usuario" title="<%= aluno.email %>">

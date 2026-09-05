@@ -1,8 +1,13 @@
 // Planos de assinatura exibidos na landing page e servidos por /api/planos.
+//
+// `nivel` e a hierarquia usada para rotular a troca de plano como upgrade,
+// downgrade ou troca lateral (mesmo nivel, conteudo diferente). Nao e preco:
+// o anual custa menos por mes que o mensal e ainda assim e o nivel mais alto.
 
 export const planos = [
   {
     id: 'materia',
+    nivel: 1,
     nome: 'Por Matéria',
     preco: 39.9,
     periodo: '/mês',
@@ -19,6 +24,7 @@ export const planos = [
   },
   {
     id: 'exatas',
+    nivel: 2,
     nome: 'Combo Exatas',
     preco: 69.9,
     periodo: '/mês',
@@ -36,6 +42,7 @@ export const planos = [
   },
   {
     id: 'automotivo',
+    nivel: 2,
     nome: 'Combo Automotivo',
     preco: 69.9,
     periodo: '/mês',
@@ -54,6 +61,7 @@ export const planos = [
   },
   {
     id: 'mensal',
+    nivel: 3,
     nome: 'Completo Mensal',
     preco: 89.9,
     periodo: '/mês',
@@ -72,6 +80,7 @@ export const planos = [
   },
   {
     id: 'anual',
+    nivel: 4,
     nome: 'Completo Anual',
     preco: 59.9,
     periodo: '/mês',

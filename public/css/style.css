@@ -73,6 +73,8 @@ img { max-width: 100%; display: block; }
 
 .btn-grande { padding: .95rem 1.8rem; font-size: 1rem; }
 .btn-bloco { width: 100%; }
+/* Convite de instalacao do app: some quando ja esta instalado (main.js). */
+.btn-instalar { padding: .5rem 1rem; font-size: .88rem; }
 
 /* ---------------- Cabeçalho ---------------- */
 .cabecalho {
@@ -325,6 +327,24 @@ img { max-width: 100%; display: block; }
 .plano-beneficios li { position: relative; padding-left: 1.6rem; font-size: .91rem; color: var(--dark-2); }
 .plano-beneficios li::before { content: '✓'; position: absolute; left: 0; color: #16a34a; font-weight: 800; }
 .card-plano .btn { margin-top: auto; }
+
+/* Plano que o aluno ja assina: contorno verde, selo proprio e CTA travado. */
+.card-plano.atual {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, .14), var(--sombra);
+}
+.selo-atual { background: #16a34a; }
+.btn-plano-atual {
+  background: #dcfce7; color: #15803d; border-color: #86efac; cursor: default;
+}
+.btn-plano-atual:hover { transform: none; }
+
+/* Diferenca mensal em relacao ao plano vigente. */
+.plano-troca { font-size: .8rem; font-weight: 700; text-align: center; margin-top: -.3rem; }
+.plano-troca.upgrade   { color: #15803d; }
+.plano-troca.downgrade { color: #b45309; }
+.planos-aviso { color: var(--gray); }
+.planos-aviso strong { color: var(--dark); }
 
 /* ---------------- CTA final ---------------- */
 .cta-final {
@@ -604,6 +624,7 @@ img { max-width: 100%; display: block; }
 .tag-pendente  { background: #fef3c7; color: #b45309; }
 .tag-recusada,
 .tag-cancelada { background: #fee2e2; color: #991b1b; }
+.tag-trocada   { background: #e2e8f0; color: #475569; }
 
 .form-assinar { margin-top: auto; }
 .plano-nota { font-size: .78rem; color: var(--gray); text-align: center; margin-top: -.4rem; }

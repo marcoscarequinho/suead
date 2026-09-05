@@ -8,16 +8,19 @@ import {
 import { trilhaDoAluno, duvidasDoAluno, resumoDoAluno } from '../repositories/alunos.js';
 import { assinaturaAtiva, historicoDoAluno } from '../repositories/assinaturas.js';
 import { conciliarPendentes } from '../services/conciliacao.js';
+import { decorarPlanos } from '../services/planos.js';
 import { exigirLogin } from '../middleware/auth.js';
 
 const router = Router();
 
 router.get('/', async (req, res, next) => {
   try {
-    const [materias, planos, depoimentos] = await Promise.all([
+    // A assinatura ativa entra na home para marcar o plano do aluno na grade.
+    const [materias, planos, depoimentos, assinatura] = await Promise.all([
       listarMaterias(),
       listarPlanos(),
-      listarDepoimentos()
+      listarDepoimentos(),
+      req.aluno ? assinaturaAtiva(req.aluno.id) : null
     ]);
 
     res.render('index', {
@@ -26,7 +29,8 @@ router.get('/', async (req, res, next) => {
         'Exatas, humanas, idiomas e cursos técnicos do básico ao avançado, com professores avatares de inteligência artificial e tira-dúvidas 24/7.',
       pagina: 'inicio',
       materias,
-      planos,
+      planos: decorarPlanos(planos, assinatura),
+      assinatura,
       depoimentos
     });
   } catch (erro) {
