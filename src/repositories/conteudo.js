@@ -169,6 +169,46 @@ export async function registrarDuvida({ alunoId, materiaSlug, nivelCodigo, topic
   }
 }
 
+/* ---------------- Aulas geradas ---------------- */
+
+/** Busca o roteiro ja gerado para um topico, se existir. */
+export async function buscarAula({ materiaSlug, nivelCodigo, topico }) {
+  if (!temBanco) return null;
+  try {
+    const { rows } = await pool.query(
+      `select roteiro, modelo, criado_em from aulas
+        where materia_slug = $1 and nivel_codigo = $2 and topico = $3`,
+      [materiaSlug, nivelCodigo, topico]
+    );
+    return rows[0] ?? null;
+  } catch (erro) {
+    console.error('[aula] falha ao ler do banco:', erro.message);
+    return null;
+  }
+}
+
+/**
+ * Guarda o roteiro gerado. Duas geracoes simultaneas do mesmo topico nao
+ * conflitam: a segunda apenas atualiza a linha.
+ */
+export async function salvarAula({ materiaSlug, nivelCodigo, topico, roteiro, modelo }) {
+  if (!temBanco) return null;
+  try {
+    const { rows } = await pool.query(
+      `insert into aulas (materia_slug, nivel_codigo, topico, roteiro, modelo)
+       values ($1, $2, $3, $4, $5)
+       on conflict (materia_slug, nivel_codigo, topico)
+       do update set roteiro = excluded.roteiro, modelo = excluded.modelo, criado_em = now()
+       returning id, criado_em`,
+      [materiaSlug, nivelCodigo, topico, JSON.stringify(roteiro), modelo]
+    );
+    return rows[0];
+  } catch (erro) {
+    console.error('[aula] não salva:', erro.message);
+    return null;
+  }
+}
+
 /** Numeros agregados para a area do aluno / painel. */
 export async function estatisticas() {
   if (!temBanco) return null;

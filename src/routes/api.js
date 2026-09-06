@@ -13,6 +13,7 @@ import { verificarConexao } from '../db/pool.js';
 import { modoPagamento, pagamentoConfigurado } from '../services/pagamento.js';
 import { sintetizar, modoVoz } from '../services/voz.js';
 import { responderDuvida, nivelar, gerarAvatar, modo } from '../services/ia.js';
+import { aulaDoTopico, narracao } from '../services/aulas.js';
 
 const router = Router();
 
@@ -60,7 +61,7 @@ router.post('/conteudo/recarregar', async (req, res) => {
 // Assistente de duvidas da aula (barra lateral). Toda pergunta e persistida.
 router.post('/chat', async (req, res, next) => {
   try {
-    const { pergunta, materia, nivel, topico } = req.body ?? {};
+    const { pergunta, materia, nivel, topico, historico } = req.body ?? {};
     if (!pergunta || !String(pergunta).trim()) {
       return res.status(400).json({ erro: 'Envie uma pergunta.' });
     }
@@ -69,7 +70,8 @@ router.post('/chat', async (req, res, next) => {
       pergunta: String(pergunta),
       materiaSlug: materia,
       nivelId: nivel,
-      topico
+      topico,
+      historico: Array.isArray(historico) ? historico : []
     });
 
     await registrarDuvida({
@@ -84,6 +86,17 @@ router.post('/chat', async (req, res, next) => {
 
     res.json(resultado);
   } catch (erro) {
+    if (erro.codigo === 'RECUSA') {
+      return res.status(422).json({ erro: erro.message });
+    }
+    // Falha do provedor de LLM: o aluno precisa saber que foi a IA que caiu,
+    // e nao receber uma resposta generica fingindo que deu certo.
+    if (erro.status) {
+      console.error('[chat] erro do provedor de LLM:', erro.status, erro.message);
+      return res.status(502).json({
+        erro: 'O professor de IA está indisponível no momento. Tente de novo em instantes.'
+      });
+    }
     next(erro);
   }
 });
@@ -122,6 +135,36 @@ router.post('/voz', async (req, res, next) => {
     res.json(await sintetizar({ texto, materiaSlug: materia, idioma }));
   } catch (erro) {
     if (erro.codigo === 'TEXTO_VAZIO') return res.status(400).json({ erro: erro.message });
+    next(erro);
+  }
+});
+
+// Roteiro da aula de um topico. Servido do banco; gerado na primeira vez.
+router.post('/aula', async (req, res, next) => {
+  try {
+    const { materia, nivel, topico } = req.body ?? {};
+    const aula = await aulaDoTopico({ materiaSlug: materia, nivelId: nivel, topico });
+    if (!aula) return res.status(404).json({ erro: 'Matéria não encontrada.' });
+
+    res.json({ ...aula, narracao: narracao(aula.roteiro) });
+  } catch (erro) {
+    if (erro.codigo === 'TOPICO_INVALIDO') {
+      return res.status(400).json({ erro: erro.message });
+    }
+    if (erro.codigo === 'SEM_CHAVE') {
+      return res.status(503).json({
+        erro: 'As aulas ainda não foram geradas e a chave do professor de IA não está configurada.'
+      });
+    }
+    if (erro.codigo === 'RECUSA') {
+      return res.status(422).json({ erro: erro.message });
+    }
+    if (erro.status) {
+      console.error('[aula] erro do provedor de LLM:', erro.status, erro.message);
+      return res.status(502).json({
+        erro: 'Não consegui escrever esta aula agora. Tente de novo em instantes.'
+      });
+    }
     next(erro);
   }
 });

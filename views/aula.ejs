@@ -61,13 +61,25 @@
 
       <div class="aula-topicos">
         <h2>Roteiro deste nível</h2>
-        <ol>
+        <ol id="lista-topicos">
           <% nivel.topicos.forEach(function (t, i) { %>
-          <li class="<%= i === 0 ? 'atual' : '' %>"><%= t %></li>
+          <li class="<%= i === 0 ? 'atual' : '' %>">
+            <button type="button" class="topico-btn" data-topico="<%= t %>"><%= t %></button>
+          </li>
           <% }) %>
         </ol>
         <p class="nivel-duracao"><%= nivel.duracao %></p>
       </div>
+
+      <!-- A aula em si: escrita pelo professor de IA a partir da ementa e
+           guardada no banco (ver POST /api/aula). -->
+      <section class="aula-conteudo" id="aula-conteudo"
+               data-materia="<%= materia.slug %>"
+               data-nivel="<%= nivel.id %>"
+               data-topico="<%= nivel.topicos[0] %>"
+               aria-live="polite">
+        <p class="aula-carregando">Abrindo a aula de <strong><%= nivel.topicos[0] %></strong>…</p>
+      </section>
     </section>
 
     <!-- Barra lateral de dúvidas -->

@@ -39,6 +39,19 @@ create table if not exists topicos (
   ordem       integer not null default 0
 );
 
+-- Aulas escritas pelo professor de IA a partir da ementa (um roteiro por
+-- topico). Geradas uma unica vez e servidas do banco a partir dai.
+create table if not exists aulas (
+  id            serial primary key,
+  materia_slug  text not null,
+  nivel_codigo  text not null,
+  topico        text not null,
+  roteiro       jsonb not null,
+  modelo        text not null,
+  criado_em     timestamptz not null default now(),
+  unique (materia_slug, nivel_codigo, topico)
+);
+
 create table if not exists planos (
   id          serial primary key,
   codigo      text not null unique,

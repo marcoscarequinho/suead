@@ -416,6 +416,50 @@ img { max-width: 100%; display: block; }
 .aula-topicos h2 { font-size: 1.1rem; margin-bottom: .9rem; }
 .aula-topicos ol { padding-left: 1.2rem; display: grid; gap: .5rem; color: var(--gray); font-size: .93rem; }
 .aula-topicos li.atual { color: var(--dark); font-weight: 700; }
+.topico-btn {
+  border: 0; background: none; padding: 0; text-align: left; cursor: pointer;
+  font: inherit; color: inherit;
+}
+.topico-btn:hover { color: var(--cor-materia, var(--primary)); text-decoration: underline; }
+
+/* ---------- A aula escrita pelo professor de IA ---------- */
+.aula-conteudo {
+  background: #fff; border-radius: var(--raio-g); padding: 1.75rem;
+  margin-top: 1.5rem; box-shadow: var(--sombra); line-height: 1.7;
+}
+.aula-conteudo p { margin-bottom: .9rem; }
+.aula-conteudo h3 {
+  font-size: 1.15rem; margin: 1.6rem 0 .7rem;
+  color: var(--cor-materia, var(--primary));
+}
+.aula-conteudo h3:first-child { margin-top: 0; }
+.aula-abertura { font-size: 1.05rem; font-weight: 600; color: var(--dark); }
+.aula-fechamento {
+  border-top: 1px solid var(--gray-claro); padding-top: 1rem; margin-top: 1.5rem;
+  color: var(--gray); font-style: italic;
+}
+.aula-exemplo {
+  background: color-mix(in srgb, var(--cor-materia, var(--primary)) 7%, #fff);
+  border-left: 3px solid var(--cor-materia, var(--primary));
+  border-radius: 0 var(--raio) var(--raio) 0;
+  padding: 1rem 1.1rem; margin: .9rem 0;
+}
+.aula-exemplo p:last-child { margin-bottom: 0; }
+.aula-rotulo {
+  display: block; font-size: .72rem; font-weight: 800; letter-spacing: .08em;
+  text-transform: uppercase; margin-bottom: .5rem;
+  color: var(--cor-materia, var(--primary));
+}
+.aula-exercicios { padding-left: 1.3rem; display: grid; gap: 1.4rem; }
+.aula-exercicios li { padding-left: .3rem; }
+.btn-gabarito { padding: .4rem .9rem; font-size: .85rem; }
+.aula-gabarito {
+  margin-top: .8rem; padding: .9rem 1.1rem; border-radius: var(--raio);
+  background: var(--light); border: 1px dashed var(--gray-claro);
+}
+.aula-gabarito p:last-child { margin-bottom: 0; }
+.aula-carregando { color: var(--gray); }
+.aula-erro { color: #b91c1c; font-weight: 600; }
 
 .aula-chat {
   display: flex; flex-direction: column;

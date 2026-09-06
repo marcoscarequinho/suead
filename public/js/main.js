@@ -96,6 +96,10 @@
   const form = document.getElementById('chat-form');
   const mensagens = document.getElementById('chat-mensagens');
 
+  // Conversa da aula. Vai junto de cada pergunta para o professor lembrar do
+  // que ja foi dito ("explique de novo", "e no exemplo anterior?").
+  const historico = [];
+
   function adicionarBalao(texto, classe) {
     const div = document.createElement('div');
     div.className = 'balao ' + classe;
@@ -122,7 +126,8 @@
           pergunta,
           materia: form.dataset.materia,
           nivel: form.dataset.nivel,
-          topico: form.dataset.topico
+          topico: form.dataset.topico,
+          historico
         })
       });
       const dados = await resposta.json();
@@ -134,6 +139,11 @@
       }
 
       adicionarBalao(dados.resposta, 'professor');
+
+      // So entra no historico o que de fato foi trocado com o professor.
+      historico.push({ papel: 'aluno', texto: pergunta });
+      historico.push({ papel: 'professor', texto: dados.resposta });
+      if (historico.length > 12) historico.splice(0, historico.length - 12);
 
       // O avatar lê a resposta em voz alta, se o som estiver ligado.
       if (window.EducaVoz) {
@@ -184,6 +194,157 @@
       const btn = document.getElementById(id);
       if (btn) btn.addEventListener('click', () => perguntar(texto));
     });
+  }
+
+  /* ---------- A aula do tópico ---------- */
+  const conteudo = document.getElementById('aula-conteudo');
+
+  function paragrafos(texto, classe) {
+    const frag = document.createDocumentFragment();
+    String(texto ?? '')
+      .split(/\n{2,}/)
+      .map((p) => p.trim())
+      .filter(Boolean)
+      .forEach((p) => {
+        const el = document.createElement('p');
+        if (classe) el.className = classe;
+        el.textContent = p;
+        frag.appendChild(el);
+      });
+    return frag;
+  }
+
+  // O roteiro vem do modelo, então tudo entra como texto — nunca como HTML.
+  function desenharAula(roteiro) {
+    conteudo.innerHTML = '';
+
+    conteudo.appendChild(paragrafos(roteiro.abertura, 'aula-abertura'));
+
+    (roteiro.secoes || []).forEach((secao) => {
+      const bloco = document.createElement('article');
+      bloco.className = 'aula-secao';
+
+      const h = document.createElement('h3');
+      h.textContent = secao.titulo;
+      bloco.appendChild(h);
+      bloco.appendChild(paragrafos(secao.explicacao));
+
+      if (secao.exemplo) {
+        const ex = document.createElement('div');
+        ex.className = 'aula-exemplo';
+        const rotulo = document.createElement('span');
+        rotulo.className = 'aula-rotulo';
+        rotulo.textContent = 'Exemplo';
+        ex.appendChild(rotulo);
+        ex.appendChild(paragrafos(secao.exemplo));
+        bloco.appendChild(ex);
+      }
+      conteudo.appendChild(bloco);
+    });
+
+    if ((roteiro.exercicios || []).length) {
+      const h = document.createElement('h3');
+      h.textContent = 'Exercícios';
+      conteudo.appendChild(h);
+
+      const ol = document.createElement('ol');
+      ol.className = 'aula-exercicios';
+
+      roteiro.exercicios.forEach((exercicio, i) => {
+        const li = document.createElement('li');
+        li.appendChild(paragrafos(exercicio.enunciado));
+
+        const gabarito = document.createElement('div');
+        gabarito.className = 'aula-gabarito';
+        gabarito.id = 'gabarito-' + i;
+        gabarito.hidden = true;
+        gabarito.appendChild(paragrafos(exercicio.gabarito));
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn btn-secundario btn-gabarito';
+        btn.textContent = 'Ver resposta';
+        btn.setAttribute('aria-expanded', 'false');
+        btn.setAttribute('aria-controls', gabarito.id);
+        btn.addEventListener('click', () => {
+          const aberto = !gabarito.hidden;
+          gabarito.hidden = aberto;
+          btn.setAttribute('aria-expanded', String(!aberto));
+          btn.textContent = aberto ? 'Ver resposta' : 'Esconder resposta';
+        });
+
+        li.appendChild(btn);
+        li.appendChild(gabarito);
+        ol.appendChild(li);
+      });
+      conteudo.appendChild(ol);
+    }
+
+    conteudo.appendChild(paragrafos(roteiro.fechamento, 'aula-fechamento'));
+  }
+
+  function estadoDaAula(texto, classe) {
+    conteudo.innerHTML = '';
+    const p = document.createElement('p');
+    p.className = classe;
+    p.textContent = texto;
+    conteudo.appendChild(p);
+  }
+
+  async function carregarAula(topico) {
+    if (!conteudo) return;
+    conteudo.dataset.topico = topico;
+
+    // Primeira abertura de um tópico: o professor ainda vai escrever a aula.
+    estadoDaAula('Abrindo a aula de "' + topico + '"…', 'aula-carregando');
+
+    try {
+      const resposta = await fetch('/api/aula', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          materia: conteudo.dataset.materia,
+          nivel: conteudo.dataset.nivel,
+          topico
+        })
+      });
+      const dados = await resposta.json();
+
+      if (!resposta.ok) {
+        estadoDaAula(dados.erro || 'Não consegui abrir esta aula.', 'aula-erro');
+        return;
+      }
+
+      desenharAula(dados.roteiro);
+
+      // O avatar passa a ler a aula de verdade, não mais a ementa.
+      const btn = document.getElementById('btn-ouvir');
+      if (btn && dados.narracao) btn.dataset.texto = dados.narracao;
+
+      const legendaAula = document.getElementById('legenda-aula');
+      if (legendaAula) legendaAula.textContent = topico;
+
+      // O tira-dúvidas passa a responder no contexto do tópico aberto.
+      if (form) form.dataset.topico = topico;
+    } catch (erro) {
+      estadoDaAula('Falha de conexão ao carregar a aula.', 'aula-erro');
+    }
+  }
+
+  if (conteudo) {
+    carregarAula(conteudo.dataset.topico);
+
+    const lista = document.getElementById('lista-topicos');
+    if (lista) {
+      lista.addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-topico]');
+        if (!btn || btn.dataset.topico === conteudo.dataset.topico) return;
+
+        lista.querySelectorAll('li').forEach((li) => li.classList.remove('atual'));
+        btn.closest('li').classList.add('atual');
+        carregarAula(btn.dataset.topico);
+      });
+    }
   }
 
   /* ---------- Áudio da sala de aula ---------- */
