@@ -18,7 +18,11 @@
         em tempo real, 24 horas por dia.
       </p>
       <div class="hero-acoes">
-        <a href="/area-do-aluno" class="btn btn-primario btn-grande">Comece grátis</a>
+        <% if (typeof aluno !== 'undefined' && aluno) { %>
+          <a href="/painel" class="btn btn-primario btn-grande">Continuar estudando</a>
+        <% } else { %>
+          <a href="/area-do-aluno" class="btn btn-primario btn-grande">Comece grátis</a>
+        <% } %>
         <a href="#materias" class="btn btn-secundario btn-grande">Conheça as matérias</a>
       </div>
       <ul class="hero-provas">
@@ -227,9 +231,15 @@
 
   <!-- ============ CTA FINAL ============ -->
   <section class="cta-final">
-    <h2>Sua primeira aula com um professor de IA começa hoje</h2>
-    <p>Faça o nivelamento gratuito e descubra em que ponto você realmente está.</p>
-    <a href="/area-do-aluno" class="btn btn-claro btn-grande">Comece grátis</a>
+    <% if (typeof aluno !== 'undefined' && aluno) { %>
+      <h2>Sua próxima aula com um professor de IA começa agora</h2>
+      <p>Volte para a sua trilha e continue exatamente de onde você parou.</p>
+      <a href="/painel" class="btn btn-claro btn-grande">Ir para o meu painel</a>
+    <% } else { %>
+      <h2>Sua primeira aula com um professor de IA começa hoje</h2>
+      <p>Faça o nivelamento gratuito e descubra em que ponto você realmente está.</p>
+      <a href="/area-do-aluno" class="btn btn-claro btn-grande">Comece grátis</a>
+    <% } %>
   </section>
 
 </main>
