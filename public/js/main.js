@@ -199,6 +199,77 @@
   /* ---------- A aula do tópico ---------- */
   const conteudo = document.getElementById('aula-conteudo');
 
+  // Botão de áudio por seção: só um toca por vez.
+  //
+  // voz.js dispara 'voz:fim' de forma preventiva sempre que uma nova fala
+  // começa — mesmo na primeiríssima vez, antes de qualquer áudio ter tocado —
+  // porque tocarAudio() sempre chama parar() antes de iniciar. Por isso não dá
+  // para pintar o botão como "tocando" assim que ele é clicado: esse 'voz:fim'
+  // preventivo chegaria logo em seguida e apagaria o próprio botão que acabou
+  // de começar. Em vez disso, cada clique reserva um "pedido" e só pinta o
+  // botão quando 'voz:inicio' confirma que foi ESSE pedido que começou a
+  // tocar de fato — 'voz:fim' então só reseta quem estiver confirmado.
+  let botaoAudioAtivo = null;
+  let pedidoDeAudio = 0;
+
+  function pintarBotaoAudio(botao, tocando) {
+    botao.classList.toggle('tocando', tocando);
+    botao.setAttribute('aria-pressed', String(tocando));
+    botao.innerHTML = tocando
+      ? '<span aria-hidden="true">⏸</span> Parar'
+      : '<span aria-hidden="true">🔊</span> Ouvir';
+  }
+
+  document.addEventListener('voz:fim', () => {
+    if (botaoAudioAtivo) {
+      pintarBotaoAudio(botaoAudioAtivo, false);
+      botaoAudioAtivo = null;
+    }
+  });
+
+  function botaoDeAudio(texto) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn-audio-secao';
+    btn.setAttribute('aria-label', 'Ouvir esta seção em voz alta');
+    pintarBotaoAudio(btn, false);
+
+    const voz = window.EducaVoz;
+    if (!voz || !voz.suportaFala) {
+      btn.disabled = true;
+      btn.title = 'Este navegador não tem síntese de voz.';
+      return btn;
+    }
+
+    btn.addEventListener('click', async () => {
+      if (botaoAudioAtivo === btn) {
+        botaoAudioAtivo = null;
+        pintarBotaoAudio(btn, false);
+        return voz.parar();
+      }
+
+      const meuPedido = ++pedidoDeAudio;
+      if (botaoAudioAtivo) pintarBotaoAudio(botaoAudioAtivo, false);
+      botaoAudioAtivo = null;
+
+      function aoIniciar() {
+        if (meuPedido !== pedidoDeAudio) return; // um pedido mais novo já chegou
+        botaoAudioAtivo = btn;
+        pintarBotaoAudio(btn, true);
+      }
+      document.addEventListener('voz:inicio', aoIniciar, { once: true });
+
+      const ok = await voz.falar(texto, conteudo.dataset.materia, true);
+      document.removeEventListener('voz:inicio', aoIniciar);
+      if (!ok && botaoAudioAtivo === btn) {
+        botaoAudioAtivo = null;
+        pintarBotaoAudio(btn, false);
+      }
+    });
+
+    return btn;
+  }
+
   function paragrafos(texto, classe) {
     const frag = document.createDocumentFragment();
     String(texto ?? '')
@@ -224,9 +295,17 @@
       const bloco = document.createElement('article');
       bloco.className = 'aula-secao';
 
+      const cabecalho = document.createElement('div');
+      cabecalho.className = 'aula-secao-cabecalho';
+
       const h = document.createElement('h3');
       h.textContent = secao.titulo;
-      bloco.appendChild(h);
+      cabecalho.appendChild(h);
+
+      const textoDaSecao = [secao.titulo, secao.explicacao, secao.exemplo].filter(Boolean).join('. ');
+      cabecalho.appendChild(botaoDeAudio(textoDaSecao));
+
+      bloco.appendChild(cabecalho);
       bloco.appendChild(paragrafos(secao.explicacao));
 
       if (secao.exemplo) {
