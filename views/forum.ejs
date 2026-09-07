@@ -1,0 +1,48 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+
+<main id="conteudo">
+  <section class="capa-aluno">
+    <span class="etiqueta">Comunidade</span>
+    <h1>Fórum</h1>
+    <p>Troque ideias com outros alunos, tire dúvidas e compartilhe dicas de estudo.</p>
+  </section>
+
+  <section class="secao">
+    <div class="admin-cartao">
+      <h2>Novo tópico</h2>
+      <form method="post" action="/forum" class="formulario">
+        <label>
+          Título
+          <input type="text" name="titulo" maxlength="140" required>
+        </label>
+        <label>
+          Mensagem
+          <textarea name="corpo" rows="4" required></textarea>
+        </label>
+        <button type="submit" class="btn btn-primario">Publicar</button>
+      </form>
+    </div>
+
+    <div class="forum-lista">
+      <% if (!topicos.length) { %>
+        <p class="admin-vazio">Ainda não há tópicos. Seja o primeiro a publicar.</p>
+      <% } %>
+      <% topicos.forEach(function (t) { %>
+      <article class="forum-topico-card">
+        <h3>
+          <% if (t.fixado) { %><span class="forum-topico-fixado">📌 </span><% } %>
+          <a href="/forum/<%= t.id %>"><%= t.titulo %></a>
+        </h3>
+        <p class="forum-topico-meta">
+          <span><%= t.autor_nome || t.autor_email || 'Aluno' %></span>
+          <span><%= new Date(t.criado_em).toLocaleDateString('pt-BR') %></span>
+          <span><%= t.total_respostas %> resposta<%= t.total_respostas === 1 ? '' : 's' %></span>
+        </p>
+      </article>
+      <% }) %>
+    </div>
+  </section>
+</main>
+
+<%- include('partials/footer') %>

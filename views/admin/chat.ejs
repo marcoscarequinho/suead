@@ -1,0 +1,33 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+
+<main id="conteudo">
+  <div class="admin-shell">
+    <div class="admin-topo"><h1>Chat de suporte</h1></div>
+    <nav class="admin-nav">
+      <a href="/admin">Visão geral</a>
+      <a href="/admin/alunos">Alunos</a>
+      <a href="/admin/planos">Planos</a>
+      <a href="/admin/solicitacoes">Solicitações</a>
+      <a href="/admin/chat" class="ativo">Chat</a>
+    </nav>
+
+    <% if (!conversas.length) { %>
+      <p class="admin-vazio">Nenhuma conversa ainda.</p>
+    <% } else { %>
+    <div class="admin-chat-lista">
+      <% conversas.forEach(function (c) { %>
+      <a class="admin-chat-item" href="/admin/chat/<%= c.id %>">
+        <div>
+          <strong><%= c.aluno_nome || c.aluno_email %></strong>
+          <p><%= c.ultima_mensagem ? (c.ultimo_remetente === 'admin' ? 'Você: ' : '') + c.ultima_mensagem.slice(0, 70) : 'Sem mensagens' %></p>
+        </div>
+        <% if (c.nao_lidas > 0) { %><span class="tag tag-pendente"><%= c.nao_lidas %></span><% } %>
+      </a>
+      <% }) %>
+    </div>
+    <% } %>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

@@ -9,6 +9,7 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "db:setup": "node src/db/setup.js",
+    "admin:criar": "node src/db/criar-admin.js",
     "pagamentos:conciliar": "node src/db/conciliar.js",
     "icones": "node scripts/gerar-icones.mjs"
   },

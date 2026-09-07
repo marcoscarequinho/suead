@@ -32,6 +32,10 @@ create table if not exists niveis (
 alter table materias add column if not exists idioma text;
 alter table niveis   add column if not exists expressoes jsonb not null default '[]'::jsonb;
 
+-- Ressalva exibida na materia/aula (ex.: cursos que sao reforco, nao formacao
+-- profissional, como Advocacia, Medicina e Transito).
+alter table materias add column if not exists aviso text;
+
 create table if not exists topicos (
   id          serial primary key,
   nivel_id    integer not null references niveis(id) on delete cascade,
@@ -67,6 +71,10 @@ create table if not exists planos (
 );
 alter table planos add column if not exists nivel integer not null default 0;
 
+-- Liga quando o admin edita o preco pelo painel: impede que o db:setup
+-- sobrescreva o valor com o que esta em src/data/planos.js no proximo deploy.
+alter table planos add column if not exists preco_manual boolean not null default false;
+
 create table if not exists depoimentos (
   id          serial primary key,
   nome        text not null,
@@ -94,6 +102,9 @@ create table if not exists alunos (
 -- Colunas de autenticacao para bancos criados antes do login existir.
 alter table alunos add column if not exists senha_hash    text;
 alter table alunos add column if not exists ultimo_acesso timestamptz;
+
+-- Papel do usuario: 'aluno' (padrao) ou 'admin' (area /admin).
+alter table alunos add column if not exists tipo text not null default 'aluno';
 
 -- Sessoes de login (connect-pg-simple).
 create table if not exists sessoes (
@@ -161,6 +172,78 @@ create table if not exists assinaturas (
 -- Ultima consulta de conciliacao ao gateway (evita reconsultar a cada acesso).
 alter table assinaturas add column if not exists verificado_em timestamptz;
 
+-- Matria escolhida no checkout do plano "Por Materia" (plano_codigo = 'materia').
+-- So essa fica liberada para o aluno; trocar exige aprovacao do admin.
+alter table assinaturas add column if not exists materia_escolhida text;
+
+-- ---------- Acesso e suporte ----------
+
+-- Acesso gratuito concedido pelo admin a um aluno especifico, sem prazo
+-- (fica ativo ate ser revogado). Escopo 'total' libera o site inteiro;
+-- 'materia' libera so a materia indicada.
+create table if not exists isencoes (
+  id             serial primary key,
+  aluno_id       integer not null references alunos(id) on delete cascade,
+  escopo         text not null default 'total', -- total | materia
+  materia_slug   text,
+  motivo         text,
+  concedida_por  integer references alunos(id) on delete set null,
+  ativa          boolean not null default true,
+  criado_em      timestamptz not null default now(),
+  revogada_em    timestamptz
+);
+
+-- Pedido do aluno para trocar a materia liberada pelo plano "Por Materia".
+-- So passa a valer quando um admin aprova.
+create table if not exists solicitacoes_troca (
+  id                serial primary key,
+  aluno_id          integer not null references alunos(id) on delete cascade,
+  assinatura_id     integer references assinaturas(id) on delete cascade,
+  materia_atual     text,
+  materia_solicitada text not null,
+  motivo            text,
+  status            text not null default 'pendente', -- pendente | aprovada | recusada
+  resposta_admin    text,
+  criado_em         timestamptz not null default now(),
+  respondido_em     timestamptz
+);
+
+-- Forum de interacao entre alunos.
+create table if not exists forum_topicos (
+  id          serial primary key,
+  aluno_id    integer references alunos(id) on delete set null,
+  titulo      text not null,
+  corpo       text not null,
+  fixado      boolean not null default false,
+  criado_em   timestamptz not null default now()
+);
+
+create table if not exists forum_respostas (
+  id          serial primary key,
+  topico_id   integer not null references forum_topicos(id) on delete cascade,
+  aluno_id    integer references alunos(id) on delete set null,
+  corpo       text not null,
+  criado_em   timestamptz not null default now()
+);
+
+-- Chat direto com o admin (nao a IA). Uma conversa continua por aluno.
+create table if not exists conversas_suporte (
+  id            serial primary key,
+  aluno_id      integer not null references alunos(id) on delete cascade unique,
+  status        text not null default 'aberta', -- aberta | encerrada
+  criado_em     timestamptz not null default now(),
+  atualizado_em timestamptz not null default now()
+);
+
+create table if not exists mensagens_suporte (
+  id            serial primary key,
+  conversa_id   integer not null references conversas_suporte(id) on delete cascade,
+  remetente     text not null, -- aluno | admin
+  texto         text not null,
+  lida          boolean not null default false,
+  criado_em     timestamptz not null default now()
+);
+
 -- ---------- Indices ----------
 
 create index if not exists idx_assinaturas_aluno  on assinaturas (aluno_id, criado_em desc);
@@ -171,3 +254,10 @@ create index if not exists idx_topicos_nivel     on topicos (nivel_id, ordem);
 create index if not exists idx_nivelamentos_data on nivelamentos (criado_em desc);
 create index if not exists idx_duvidas_data      on duvidas (criado_em desc);
 create index if not exists idx_duvidas_materia   on duvidas (materia_slug, criado_em desc);
+
+create index if not exists idx_isencoes_aluno       on isencoes (aluno_id, ativa);
+create index if not exists idx_solicitacoes_status   on solicitacoes_troca (status, criado_em desc);
+create index if not exists idx_forum_topicos_data    on forum_topicos (fixado desc, criado_em desc);
+create index if not exists idx_forum_respostas_topico on forum_respostas (topico_id, criado_em);
+create index if not exists idx_mensagens_conversa    on mensagens_suporte (conversa_id, criado_em);
+create index if not exists idx_conversas_atualizada  on conversas_suporte (atualizado_em desc);

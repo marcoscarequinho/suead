@@ -14,6 +14,7 @@ import { modoPagamento, pagamentoConfigurado } from '../services/pagamento.js';
 import { sintetizar, modoVoz } from '../services/voz.js';
 import { responderDuvida, nivelar, gerarAvatar, modo } from '../services/ia.js';
 import { aulaDoTopico, narracao } from '../services/aulas.js';
+import { materiaBloqueada } from '../services/acesso.js';
 
 const router = Router();
 
@@ -64,6 +65,9 @@ router.post('/chat', async (req, res, next) => {
     const { pergunta, materia, nivel, topico, historico } = req.body ?? {};
     if (!pergunta || !String(pergunta).trim()) {
       return res.status(400).json({ erro: 'Envie uma pergunta.' });
+    }
+    if (req.aluno && materia && (await materiaBloqueada(req.aluno.id, materia))) {
+      return res.status(403).json({ erro: 'Seu plano não dá acesso a esta matéria.' });
     }
 
     const resultado = await responderDuvida({
@@ -132,6 +136,9 @@ router.post('/nivelamento', async (req, res, next) => {
 router.post('/voz', async (req, res, next) => {
   try {
     const { texto, materia, idioma } = req.body ?? {};
+    if (req.aluno && materia && (await materiaBloqueada(req.aluno.id, materia))) {
+      return res.status(403).json({ erro: 'Seu plano não dá acesso a esta matéria.' });
+    }
     res.json(await sintetizar({ texto, materiaSlug: materia, idioma }));
   } catch (erro) {
     if (erro.codigo === 'TEXTO_VAZIO') return res.status(400).json({ erro: erro.message });
@@ -143,6 +150,9 @@ router.post('/voz', async (req, res, next) => {
 router.post('/aula', async (req, res, next) => {
   try {
     const { materia, nivel, topico } = req.body ?? {};
+    if (req.aluno && materia && (await materiaBloqueada(req.aluno.id, materia))) {
+      return res.status(403).json({ erro: 'Seu plano não dá acesso a esta matéria.' });
+    }
     const aula = await aulaDoTopico({ materiaSlug: materia, nivelId: nivel, topico });
     if (!aula) return res.status(404).json({ erro: 'Matéria não encontrada.' });
 

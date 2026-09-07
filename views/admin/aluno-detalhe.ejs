@@ -1,0 +1,87 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+
+<main id="conteudo">
+  <div class="admin-shell">
+    <div class="admin-topo"><h1><%= aluno.nome || aluno.email %></h1></div>
+    <nav class="admin-nav">
+      <a href="/admin">Visão geral</a>
+      <a href="/admin/alunos" class="ativo">Alunos</a>
+      <a href="/admin/planos">Planos</a>
+      <a href="/admin/solicitacoes">Solicitações</a>
+      <a href="/admin/chat">Chat</a>
+    </nav>
+
+    <div class="admin-cartao">
+      <h2>Dados</h2>
+      <p><strong>E-mail:</strong> <%= aluno.email %></p>
+      <p><strong>Cadastro:</strong> <%= new Date(aluno.criado_em).toLocaleDateString('pt-BR') %></p>
+      <p><strong>Último acesso:</strong> <%= aluno.ultimo_acesso ? new Date(aluno.ultimo_acesso).toLocaleDateString('pt-BR') : '—' %></p>
+    </div>
+
+    <div class="admin-cartao">
+      <h2>Histórico de assinaturas</h2>
+      <% if (!historico.length) { %>
+        <p class="admin-vazio">Nenhuma assinatura registrada.</p>
+      <% } else { %>
+      <table class="admin-tabela">
+        <thead><tr><th>Plano</th><th>Valor</th><th>Status</th><th>Data</th></tr></thead>
+        <tbody>
+          <% historico.forEach(function (h) { %>
+          <tr>
+            <td><%= h.plano_nome %></td>
+            <td>R$ <%= Number(h.valor).toFixed(2).replace('.', ',') %></td>
+            <td><span class="tag tag-<%= h.status %>"><%= h.status %></span></td>
+            <td><%= new Date(h.criado_em).toLocaleDateString('pt-BR') %></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+      <% } %>
+    </div>
+
+    <div class="admin-cartao">
+      <h2>Isenção (acesso grátis)</h2>
+      <% if (isencaoAtiva) { %>
+        <p>
+          Ativa: <strong><%= isencaoAtiva.escopo === 'total' ? 'site inteiro' : isencaoAtiva.materia_slug %></strong>
+          <% if (isencaoAtiva.motivo) { %> — <%= isencaoAtiva.motivo %><% } %>
+        </p>
+        <form method="post" action="/admin/alunos/<%= aluno.id %>/isencao/<%= isencaoAtiva.id %>/revogar">
+          <button type="submit" class="btn btn-secundario">Revogar isenção</button>
+        </form>
+      <% } else { %>
+        <p class="nota">Sem isenção ativa. Conceder acesso gratuito indeterminado, a seu critério:</p>
+        <form method="post" action="/admin/alunos/<%= aluno.id %>/isencao" class="admin-form">
+          <label>
+            Escopo
+            <select name="escopo" id="isencao-escopo">
+              <option value="total">Site inteiro</option>
+              <option value="materia">Uma matéria específica</option>
+            </select>
+          </label>
+          <label id="campo-materia" hidden>
+            Matéria
+            <select name="materia">
+              <% materias.forEach(function (m) { %>
+              <option value="<%= m.slug %>"><%= m.nome %></option>
+              <% }) %>
+            </select>
+          </label>
+          <label>
+            Motivo (opcional)
+            <input type="text" name="motivo" maxlength="200">
+          </label>
+          <button type="submit" class="btn btn-primario">Conceder isenção</button>
+        </form>
+        <script>
+          document.getElementById('isencao-escopo').addEventListener('change', function (e) {
+            document.getElementById('campo-materia').hidden = e.target.value !== 'materia';
+          });
+        </script>
+      <% } %>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

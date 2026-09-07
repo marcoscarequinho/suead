@@ -617,12 +617,13 @@ img { max-width: 100%; display: block; }
 
 .formulario { display: grid; gap: .3rem; }
 .formulario label { font-weight: 700; font-size: .86rem; margin-top: .8rem; }
-.formulario input {
+.formulario input, .formulario textarea {
   padding: .8rem .9rem; border: 1px solid var(--gray-claro); border-radius: 10px;
   font: inherit; font-size: .95rem; background: #fff; color: var(--dark);
 }
-.formulario input::placeholder { color: #94a3b8; }
-.formulario input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(79, 70, 229, .14); }
+.formulario textarea { resize: vertical; min-height: 90px; }
+.formulario input::placeholder, .formulario textarea::placeholder { color: #94a3b8; }
+.formulario input:focus, .formulario textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(79, 70, 229, .14); }
 .formulario .btn { margin-top: 1.6rem; }
 
 .alerta {
@@ -764,3 +765,129 @@ img { max-width: 100%; display: block; }
 .frase-som { font-size: 1.05rem; flex: none; }
 .frase-btn.falando .frase-som { animation: pulsar .9s infinite; }
 .frase-traducao { font-size: .84rem; color: var(--gray); padding-left: 2.2rem; }
+
+/* ---- Ressalva em fundo escuro (capa da matéria) ---- */
+.capa-materia .aviso-materia {
+  color: #fff; background: rgba(0, 0, 0, .22);
+  border-radius: 10px; padding: .7rem .9rem; margin: .8rem 0 0;
+  max-width: 62ch;
+}
+.capa-materia .aviso-materia strong { color: #fecaca; }
+
+/* ---- Select de matéria no card "Por Matéria" ---- */
+.select-materia { display: block; margin-bottom: .9rem; text-align: left; }
+.rotulo-select { display: block; font-weight: 700; font-size: .82rem; margin-bottom: .3rem; color: var(--dark-2); }
+.select-materia select {
+  width: 100%; padding: .7rem .8rem; border: 1px solid var(--gray-claro);
+  border-radius: 10px; font: inherit; background: #fff; color: var(--dark);
+}
+
+/* ---- Solicitar troca de matéria (painel) ---- */
+.form-troca-materia { display: grid; gap: .8rem; margin-top: .8rem; }
+.form-troca-materia label { display: block; font-weight: 700; font-size: .86rem; }
+.form-troca-materia select,
+.form-troca-materia input {
+  display: block; width: 100%; margin-top: .3rem;
+  padding: .7rem .8rem; border: 1px solid var(--gray-claro); border-radius: 10px; font: inherit;
+}
+details > summary { cursor: pointer; font-weight: 700; color: var(--primary); margin-top: .8rem; }
+
+/* ================= Fórum ================= */
+.forum-lista { display: grid; gap: 1rem; }
+.forum-topico-card {
+  background: #fff; border: 1px solid var(--gray-claro); border-radius: var(--raio);
+  padding: 1.2rem 1.4rem; box-shadow: var(--sombra);
+}
+.forum-topico-card h3 { font-size: 1.05rem; margin-bottom: .3rem; }
+.forum-topico-card h3 a { color: var(--dark); }
+.forum-topico-meta { font-size: .8rem; color: var(--gray); display: flex; gap: .8rem; flex-wrap: wrap; }
+.forum-topico-fixado { color: var(--primary); font-weight: 700; }
+
+.forum-thread-corpo { background: #fff; border-radius: var(--raio-g); box-shadow: var(--sombra); padding: 1.6rem; margin-bottom: 1.4rem; }
+.forum-resposta { border-top: 1px solid var(--gray-claro); padding: 1rem 0; }
+.forum-resposta:first-child { border-top: none; }
+.forum-resposta-meta { font-size: .8rem; color: var(--gray); margin-bottom: .3rem; }
+
+/* ================= Chat de suporte (botão flutuante) ================= */
+.suporte-flutuante {
+  position: fixed; right: 1.4rem; bottom: 1.4rem; z-index: 80;
+  width: 56px; height: 56px; border-radius: 50%; border: none;
+  background: var(--primary); color: #fff; font-size: 1.4rem;
+  box-shadow: var(--sombra-g); cursor: pointer;
+  display: grid; place-items: center;
+}
+.suporte-flutuante:hover { background: var(--primary-escuro); }
+.suporte-flutuante .badge {
+  position: absolute; top: -4px; right: -4px;
+  background: #dc2626; color: #fff; font-size: .7rem; font-weight: 800;
+  border-radius: 999px; min-width: 20px; height: 20px; padding: 0 .3rem;
+  display: grid; place-items: center;
+}
+
+.suporte-painel {
+  position: fixed; right: 1.4rem; bottom: 5.2rem; z-index: 80;
+  width: min(340px, calc(100vw - 2.8rem)); height: min(460px, calc(100vh - 8rem));
+  background: #fff; border-radius: var(--raio-g); box-shadow: var(--sombra-g);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.suporte-painel-topo {
+  padding: .9rem 1.1rem; background: var(--primary); color: #fff;
+  display: flex; align-items: center; justify-content: space-between; font-weight: 700;
+}
+.suporte-painel-topo button { background: none; border: none; color: #fff; font-size: 1.1rem; cursor: pointer; }
+.suporte-mensagens { flex: 1; overflow-y: auto; padding: 1rem; display: grid; gap: .6rem; align-content: start; }
+.suporte-msg { max-width: 82%; padding: .55rem .8rem; border-radius: 12px; font-size: .9rem; line-height: 1.4; }
+.suporte-msg.aluno { align-self: flex-end; background: var(--primary); color: #fff; border-bottom-right-radius: 3px; }
+.suporte-msg.admin { align-self: flex-start; background: #f1f5f9; color: var(--dark); border-bottom-left-radius: 3px; }
+.suporte-vazio { color: var(--gray); font-size: .88rem; text-align: center; margin-top: 1rem; }
+.suporte-form { display: flex; gap: .5rem; padding: .8rem; border-top: 1px solid var(--gray-claro); }
+.suporte-form input {
+  flex: 1; padding: .6rem .8rem; border: 1px solid var(--gray-claro); border-radius: 999px; font: inherit;
+}
+.suporte-form button {
+  background: var(--primary); color: #fff; border: none; border-radius: 999px;
+  width: 38px; height: 38px; font-size: 1rem; cursor: pointer;
+}
+.suporte-convite { padding: 1.4rem; text-align: center; display: grid; gap: .8rem; }
+
+/* ================= Área do admin ================= */
+.admin-shell { max-width: 1080px; margin: 0 auto; padding: 2rem clamp(1rem, 4vw, 2rem) 4rem; }
+.admin-topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.6rem; }
+.admin-topo h1 { font-size: 1.6rem; letter-spacing: -.02em; }
+.admin-nav { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.6rem; }
+.admin-nav a {
+  padding: .5rem .9rem; border-radius: 999px; font-size: .88rem; font-weight: 700;
+  color: var(--gray); background: #f1f5f9;
+}
+.admin-nav a.ativo, .admin-nav a:hover { background: var(--primary); color: #fff; }
+
+.admin-numeros { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-bottom: 1.6rem; }
+.admin-numero { background: #fff; border: 1px solid var(--gray-claro); border-radius: var(--raio); padding: 1.1rem 1.2rem; box-shadow: var(--sombra); }
+.admin-numero strong { display: block; font-size: 1.7rem; }
+.admin-numero span { font-size: .8rem; color: var(--gray); }
+
+.admin-tabela { width: 100%; border-collapse: collapse; background: #fff; border-radius: var(--raio); overflow: hidden; box-shadow: var(--sombra); }
+.admin-tabela th, .admin-tabela td { padding: .7rem .9rem; text-align: left; font-size: .88rem; border-bottom: 1px solid var(--gray-claro); }
+.admin-tabela th { background: #f8fafc; font-size: .76rem; text-transform: uppercase; letter-spacing: .04em; color: var(--gray); }
+.admin-tabela tr:last-child td { border-bottom: none; }
+.admin-tabela a { color: var(--primary); font-weight: 700; }
+
+.admin-cartao { background: #fff; border: 1px solid var(--gray-claro); border-radius: var(--raio-g); padding: 1.4rem 1.6rem; box-shadow: var(--sombra); margin-bottom: 1.2rem; }
+.admin-form { display: grid; gap: .7rem; max-width: 480px; }
+.admin-form label { font-weight: 700; font-size: .86rem; }
+.admin-form input, .admin-form select, .admin-form textarea {
+  display: block; width: 100%; margin-top: .3rem;
+  padding: .65rem .8rem; border: 1px solid var(--gray-claro); border-radius: 10px; font: inherit;
+}
+.admin-form textarea { min-height: 100px; }
+.admin-vazio { color: var(--gray); font-size: .9rem; padding: 1rem 0; }
+
+.admin-chat-lista { display: grid; gap: .7rem; }
+.admin-chat-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  background: #fff; border: 1px solid var(--gray-claro); border-radius: var(--raio);
+  padding: .9rem 1.1rem; box-shadow: var(--sombra);
+}
+.admin-chat-item strong { display: block; }
+.admin-chat-item p { font-size: .85rem; color: var(--gray); margin: 0; }
+.admin-chat-thread { display: flex; flex-direction: column; height: 60vh; background: #fff; border-radius: var(--raio-g); box-shadow: var(--sombra); overflow: hidden; }

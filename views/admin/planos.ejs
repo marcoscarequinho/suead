@@ -1,0 +1,38 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+
+<main id="conteudo">
+  <div class="admin-shell">
+    <div class="admin-topo"><h1>Planos</h1></div>
+    <nav class="admin-nav">
+      <a href="/admin">Visão geral</a>
+      <a href="/admin/alunos">Alunos</a>
+      <a href="/admin/planos" class="ativo">Planos</a>
+      <a href="/admin/solicitacoes">Solicitações</a>
+      <a href="/admin/chat">Chat</a>
+    </nav>
+
+    <% planos.forEach(function (p) { %>
+    <div class="admin-cartao">
+      <h2><%= p.nome %> <% if (p.preco_manual) { %><span class="tag tag-ativa">preço editado</span><% } %></h2>
+      <form method="post" action="/admin/planos/<%= p.codigo %>" class="admin-form">
+        <label>Nome <input type="text" name="nome" value="<%= p.nome %>" required></label>
+        <label>Preço mensal (R$) <input type="text" name="preco" value="<%= p.preco.toFixed(2) %>" required></label>
+        <label>Chamada <input type="text" name="chamada" value="<%= p.chamada %>" required></label>
+        <label>Selo (opcional) <input type="text" name="selo" value="<%= p.selo || '' %>"></label>
+        <label>
+          Benefícios (um por linha)
+          <textarea name="beneficios" rows="5"><%= p.beneficios.join('\n') %></textarea>
+        </label>
+        <label style="display: flex; align-items: center; gap: .5rem; font-weight: 600">
+          <input type="checkbox" name="destaque" style="width: auto" <%= p.destaque ? 'checked' : '' %>>
+          Destacar este plano na home
+        </label>
+        <button type="submit" class="btn btn-primario">Salvar</button>
+      </form>
+    </div>
+    <% }) %>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

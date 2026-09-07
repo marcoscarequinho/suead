@@ -1,0 +1,17 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+
+<main id="conteudo">
+  <section class="capa-aluno">
+    <span class="etiqueta">Acesso restrito</span>
+    <h1>Seu plano não dá acesso a <%= materia.nome %></h1>
+    <p>Seu plano "Por Matéria" libera só a matéria escolhida no checkout. Peça a troca no seu
+      painel — o admin analisa e libera se aprovar.</p>
+    <div class="hero-acoes">
+      <a href="/painel" class="btn btn-primario btn-grande">Ir para o meu painel</a>
+      <a href="/#planos" class="btn btn-secundario btn-grande">Ver outros planos</a>
+    </div>
+  </section>
+</main>
+
+<%- include('partials/footer') %>

@@ -8,6 +8,10 @@
     <section class="aula-palco">
       <nav class="migalhas"><a href="/materias/<%= materia.slug %>"><%= materia.nome %></a> <span>/</span> <%= nivel.nome %></nav>
 
+      <% if (materia.aviso) { %>
+      <p class="hero-obs aviso-materia"><strong>Obs.:</strong> <%= materia.aviso %></p>
+      <% } %>
+
       <div class="palco">
         <div class="palco-topo">
           <span class="ponto ao-vivo"></span>

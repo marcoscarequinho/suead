@@ -1,0 +1,42 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+
+<main id="conteudo">
+  <div class="admin-shell">
+    <div class="admin-topo"><h1>Alunos</h1></div>
+    <nav class="admin-nav">
+      <a href="/admin">Visão geral</a>
+      <a href="/admin/alunos" class="ativo">Alunos</a>
+      <a href="/admin/planos">Planos</a>
+      <a href="/admin/solicitacoes">Solicitações</a>
+      <a href="/admin/chat">Chat</a>
+    </nav>
+
+    <form method="get" action="/admin/alunos" class="formulario" style="max-width: 360px; margin-bottom: 1.4rem">
+      <input type="search" name="busca" placeholder="Buscar por nome ou e-mail" value="<%= busca %>">
+    </form>
+
+    <% if (!alunos.length) { %>
+      <p class="admin-vazio">Nenhum aluno encontrado.</p>
+    <% } else { %>
+    <table class="admin-tabela">
+      <thead>
+        <tr><th>Nome</th><th>E-mail</th><th>Plano</th><th>Matéria</th><th></th></tr>
+      </thead>
+      <tbody>
+        <% alunos.forEach(function (a) { %>
+        <tr>
+          <td><%= a.nome || '—' %></td>
+          <td><%= a.email %></td>
+          <td><%= a.plano_nome || '—' %></td>
+          <td><%= a.materia_escolhida || '—' %></td>
+          <td><a href="/admin/alunos/<%= a.id %>">Gerenciar →</a></td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+    <% } %>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

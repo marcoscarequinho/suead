@@ -28,6 +28,7 @@
         <li><a href="/#planos">Planos e preços</a></li>
         <li><a href="/#depoimentos">Depoimentos</a></li>
         <li><a href="/area-do-aluno">Área do aluno</a></li>
+        <li><a href="/forum">Fórum</a></li>
       </ul>
     </div>
 
@@ -47,6 +48,29 @@
     <p>Feito com Node.js · O futuro da educação chegou.</p>
   </div>
 </footer>
+
+<% if (typeof aluno !== 'undefined' && aluno && aluno.tipo !== 'admin') { %>
+<!-- Chat com o admin (respondido por gente, não pela IA) -->
+<button type="button" class="suporte-flutuante" id="suporte-abrir" aria-label="Falar com o suporte" aria-expanded="false">
+  💬<span class="badge" id="suporte-badge" hidden>0</span>
+</button>
+<div class="suporte-painel" id="suporte-painel" hidden>
+  <div class="suporte-painel-topo">
+    <span>Fale com o suporte</span>
+    <button type="button" id="suporte-fechar" aria-label="Fechar chat">✕</button>
+  </div>
+  <div class="suporte-mensagens" id="suporte-mensagens">
+    <p class="suporte-vazio">Mande sua dúvida — quem responde aqui é a nossa equipe, não a IA.</p>
+  </div>
+  <form class="suporte-form" id="suporte-form">
+    <input type="text" id="suporte-texto" placeholder="Digite sua mensagem…" maxlength="1000" autocomplete="off" required>
+    <button type="submit" aria-label="Enviar">➤</button>
+  </form>
+</div>
+<script src="/js/suporte.js" defer></script>
+<% } else if (typeof aluno === 'undefined' || !aluno) { %>
+<a href="/login" class="suporte-flutuante" aria-label="Entrar para falar com o suporte" title="Entre para falar com o suporte">💬</a>
+<% } %>
 
 <script src="/js/voz.js" defer></script>
 <script src="/js/main.js" defer></script>

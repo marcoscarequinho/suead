@@ -22,7 +22,12 @@
     </button>
 
     <% if (typeof aluno !== 'undefined' && aluno) { %>
-      <a href="/painel" class="<%= pagina === 'painel' ? 'ativo' : '' %>">Meu painel</a>
+      <% if (aluno.tipo === 'admin') { %>
+        <a href="/admin" class="<%= pagina === 'admin' ? 'ativo' : '' %>">Painel admin</a>
+      <% } else { %>
+        <a href="/painel" class="<%= pagina === 'painel' ? 'ativo' : '' %>">Meu painel</a>
+        <a href="/forum" class="<%= pagina === 'forum' ? 'ativo' : '' %>">Fórum</a>
+      <% } %>
       <span class="usuario" title="<%= aluno.email %>">
         <span class="usuario-inicial" aria-hidden="true"><%= (aluno.nome || aluno.email).trim().charAt(0).toUpperCase() %></span>
         <%= (aluno.nome || aluno.email).split(' ')[0] %>

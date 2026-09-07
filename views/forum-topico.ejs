@@ -1,0 +1,51 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+
+<main id="conteudo">
+  <section class="secao">
+    <nav class="migalhas"><a href="/forum">Fórum</a> <span>/</span> <%= topico.titulo %></nav>
+
+    <div class="forum-thread-corpo">
+      <h1><%= topico.titulo %></h1>
+      <p class="forum-topico-meta">
+        <span><%= topico.autor_nome || topico.autor_email || 'Aluno' %></span>
+        <span><%= new Date(topico.criado_em).toLocaleString('pt-BR') %></span>
+      </p>
+      <p style="margin-top: 1rem; white-space: pre-wrap"><%= topico.corpo %></p>
+
+      <% if (typeof aluno !== 'undefined' && aluno && aluno.tipo === 'admin') { %>
+      <form method="post" action="/forum/<%= topico.id %>/excluir" style="margin-top: 1rem">
+        <button type="submit" class="btn btn-secundario">Excluir tópico</button>
+      </form>
+      <% } %>
+
+      <% topico.respostas.forEach(function (r) { %>
+      <div class="forum-resposta">
+        <p class="forum-resposta-meta">
+          <%= r.autor_nome || r.autor_email || 'Aluno' %> ·
+          <%= new Date(r.criado_em).toLocaleString('pt-BR') %>
+        </p>
+        <p style="white-space: pre-wrap"><%= r.corpo %></p>
+        <% if (typeof aluno !== 'undefined' && aluno && aluno.tipo === 'admin') { %>
+        <form method="post" action="/forum/<%= topico.id %>/respostas/<%= r.id %>/excluir">
+          <button type="submit" class="btn btn-secundario" style="font-size: .78rem; padding: .3rem .7rem">Excluir</button>
+        </form>
+        <% } %>
+      </div>
+      <% }) %>
+    </div>
+
+    <div class="admin-cartao">
+      <h2>Responder</h2>
+      <form method="post" action="/forum/<%= topico.id %>/respostas" class="formulario">
+        <label>
+          Sua resposta
+          <textarea name="corpo" rows="3" required></textarea>
+        </label>
+        <button type="submit" class="btn btn-primario">Enviar resposta</button>
+      </form>
+    </div>
+  </section>
+</main>
+
+<%- include('partials/footer') %>

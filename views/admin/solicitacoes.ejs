@@ -1,0 +1,38 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+
+<main id="conteudo">
+  <div class="admin-shell">
+    <div class="admin-topo"><h1>Solicitações de troca de matéria</h1></div>
+    <nav class="admin-nav">
+      <a href="/admin">Visão geral</a>
+      <a href="/admin/alunos">Alunos</a>
+      <a href="/admin/planos">Planos</a>
+      <a href="/admin/solicitacoes" class="ativo">Solicitações</a>
+      <a href="/admin/chat">Chat</a>
+    </nav>
+
+    <% if (!solicitacoes.length) { %>
+      <p class="admin-vazio">Nenhuma solicitação pendente.</p>
+    <% } %>
+
+    <% solicitacoes.forEach(function (s) { %>
+    <div class="admin-cartao">
+      <p><strong><%= s.aluno_nome || s.aluno_email %></strong> quer trocar de
+        <strong><%= s.materia_atual || '—' %></strong> para <strong><%= s.materia_solicitada %></strong></p>
+      <% if (s.motivo) { %><p class="nota">Motivo: <%= s.motivo %></p><% } %>
+      <p class="nota">Pedido em <%= new Date(s.criado_em).toLocaleString('pt-BR') %></p>
+
+      <form method="post" action="/admin/solicitacoes/<%= s.id %>/aprovar" class="admin-form" style="margin-top: .8rem">
+        <label>Resposta ao aluno (opcional) <input type="text" name="resposta" maxlength="200"></label>
+        <div style="display: flex; gap: .6rem">
+          <button type="submit" class="btn btn-primario">Aprovar</button>
+          <button type="submit" formaction="/admin/solicitacoes/<%= s.id %>/recusar" class="btn btn-secundario">Recusar</button>
+        </div>
+      </form>
+    </div>
+    <% }) %>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

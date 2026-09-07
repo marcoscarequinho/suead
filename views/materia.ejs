@@ -7,6 +7,9 @@
     <span class="capa-icone" aria-hidden="true"><%= materia.icone %></span>
     <h1><%= materia.nome %> do básico ao avançado</h1>
     <p><%= materia.resumo %></p>
+    <% if (materia.aviso) { %>
+    <p class="hero-obs aviso-materia"><strong>Obs.:</strong> <%= materia.aviso %></p>
+    <% } %>
     <p class="capa-avatar">Professor avatar: <strong><%= materia.avatar %></strong></p>
     <div class="hero-acoes">
       <a href="/aula/<%= materia.slug %>/basico" class="btn btn-claro btn-grande">Assistir aula demonstrativa</a>

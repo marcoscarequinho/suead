@@ -14,7 +14,7 @@ export function normalizarEmail(email) {
 export async function buscarPorEmail(email) {
   exigirBanco();
   const { rows } = await pool.query(
-    'select id, email, nome, senha_hash, ultimo_acesso, criado_em from alunos where email = $1',
+    'select id, email, nome, senha_hash, tipo, ultimo_acesso, criado_em from alunos where email = $1',
     [normalizarEmail(email)]
   );
   return rows[0] ?? null;
@@ -23,7 +23,7 @@ export async function buscarPorEmail(email) {
 export async function buscarPorId(id) {
   if (!temBanco || !id) return null;
   const { rows } = await pool.query(
-    'select id, email, nome, ultimo_acesso, criado_em from alunos where id = $1',
+    'select id, email, nome, tipo, ultimo_acesso, criado_em from alunos where id = $1',
     [id]
   );
   return rows[0] ?? null;
@@ -95,6 +95,31 @@ export async function duvidasDoAluno(alunoId, limite = 5) {
       order by criado_em desc
       limit $2`,
     [alunoId, limite]
+  );
+  return rows;
+}
+
+/* ---------------- Painel do admin ---------------- */
+
+/** Lista de alunos para o painel admin, com a assinatura ativa (se houver). */
+export async function listarAlunos({ busca = '', limite = 50 } = {}) {
+  if (!temBanco) return [];
+  const termo = String(busca ?? '').trim();
+  const { rows } = await pool.query(
+    `select a.id, a.nome, a.email, a.tipo, a.criado_em, a.ultimo_acesso,
+            s.plano_nome, s.plano_codigo, s.materia_escolhida, s.status as assinatura_status
+       from alunos a
+       left join lateral (
+         select plano_nome, plano_codigo, materia_escolhida, status
+           from assinaturas
+          where aluno_id = a.id and status = 'ativa'
+          order by criado_em desc limit 1
+       ) s on true
+      where a.tipo = 'aluno'
+        and ($1 = '' or a.nome ilike '%' || $1 || '%' or a.email ilike '%' || $1 || '%')
+      order by a.criado_em desc
+      limit $2`,
+    [termo, limite]
   );
   return rows;
 }

@@ -40,14 +40,14 @@ async function main() {
     // ----- Matérias, níveis e tópicos -----
     for (const [i, m] of materias.entries()) {
       const { rows } = await cliente.query(
-        `insert into materias (slug, nome, icone, cor, avatar, resumo, ordem, idioma)
-         values ($1, $2, $3, $4, $5, $6, $7, $8)
+        `insert into materias (slug, nome, icone, cor, avatar, resumo, ordem, idioma, aviso)
+         values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
          on conflict (slug) do update set
            nome = excluded.nome, icone = excluded.icone, cor = excluded.cor,
            avatar = excluded.avatar, resumo = excluded.resumo, ordem = excluded.ordem,
-           idioma = excluded.idioma
+           idioma = excluded.idioma, aviso = excluded.aviso
          returning id`,
-        [m.slug, m.nome, m.icone, m.cor, m.avatar, m.resumo, i, m.idioma ?? null]
+        [m.slug, m.nome, m.icone, m.cor, m.avatar, m.resumo, i, m.idioma ?? null, m.aviso ?? null]
       );
       const materiaId = rows[0].id;
 
@@ -82,7 +82,9 @@ async function main() {
         `insert into planos (codigo, nome, preco, periodo, chamada, destaque, selo, beneficios, cta, ordem, nivel)
          values ($1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9, $10, $11)
          on conflict (codigo) do update set
-           nome = excluded.nome, preco = excluded.preco, periodo = excluded.periodo,
+           nome = excluded.nome,
+           preco = case when planos.preco_manual then planos.preco else excluded.preco end,
+           periodo = excluded.periodo,
            chamada = excluded.chamada, destaque = excluded.destaque, selo = excluded.selo,
            beneficios = excluded.beneficios, cta = excluded.cta, ordem = excluded.ordem,
            nivel = excluded.nivel`,

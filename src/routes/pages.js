@@ -10,6 +10,8 @@ import { assinaturaAtiva, historicoDoAluno } from '../repositories/assinaturas.j
 import { conciliarPendentes } from '../services/conciliacao.js';
 import { decorarPlanos } from '../services/planos.js';
 import { exigirLogin } from '../middleware/auth.js';
+import { materiaBloqueada } from '../services/acesso.js';
+import { criarSolicitacao, solicitacaoPendenteDoAluno } from '../repositories/solicitacoesTroca.js';
 
 const router = Router();
 
@@ -60,6 +62,15 @@ router.get('/aula/:slug/:nivel?', async (req, res, next) => {
     const materia = await buscarMateria(req.params.slug);
     if (!materia) return next();
 
+    if (req.aluno && (await materiaBloqueada(req.aluno.id, materia.slug))) {
+      return res.status(403).render('acesso-restrito', {
+        titulo: 'Acesso restrito — EducaAI',
+        descricao: 'Seu plano não dá acesso a esta matéria.',
+        pagina: 'aula',
+        materia
+      });
+    }
+
     const nivel =
       materia.niveis.find((n) => n.id === req.params.nivel) ?? materia.niveis[0];
 
@@ -96,13 +107,14 @@ router.get('/painel', exigirLogin, async (req, res, next) => {
     // Sem webhook (localhost), é aqui que um pagamento aprovado vira acesso.
     await conciliarPendentes({ alunoId: req.aluno.id });
 
-    const [materias, trilha, duvidas, resumo, assinatura, pagamentos] = await Promise.all([
+    const [materias, trilha, duvidas, resumo, assinatura, pagamentos, solicitacaoPendente] = await Promise.all([
       listarMaterias(),
       trilhaDoAluno(req.aluno.id),
       duvidasDoAluno(req.aluno.id),
       resumoDoAluno(req.aluno.id),
       assinaturaAtiva(req.aluno.id),
-      historicoDoAluno(req.aluno.id, 5)
+      historicoDoAluno(req.aluno.id, 5),
+      solicitacaoPendenteDoAluno(req.aluno.id)
     ]);
 
     const porSlug = Object.fromEntries(materias.map((m) => [m.slug, m]));
@@ -115,9 +127,35 @@ router.get('/painel', exigirLogin, async (req, res, next) => {
       trilha: trilha.map((t) => ({ ...t, materia: porSlug[t.materia_slug] ?? null })),
       duvidas: duvidas.map((d) => ({ ...d, materia: porSlug[d.materia_slug] ?? null })),
       assinatura,
+      materiaLiberada: assinatura?.materia_escolhida ? (porSlug[assinatura.materia_escolhida] ?? null) : null,
       pagamentos,
-      resumo
+      resumo,
+      solicitacaoPendente
     });
+  } catch (erro) {
+    next(erro);
+  }
+});
+
+// Aluno com plano "Por Matéria" pede para trocar a matéria liberada.
+router.post('/painel/solicitar-troca', exigirLogin, async (req, res, next) => {
+  try {
+    const assinatura = await assinaturaAtiva(req.aluno.id);
+    const novaMateria = await buscarMateria(req.body.materia);
+
+    if (!assinatura || assinatura.plano_codigo !== 'materia' || !novaMateria) {
+      return res.redirect('/painel');
+    }
+
+    await criarSolicitacao({
+      alunoId: req.aluno.id,
+      assinaturaId: assinatura.id,
+      materiaAtual: assinatura.materia_escolhida,
+      materiaSolicitada: novaMateria.slug,
+      motivo: req.body.motivo
+    });
+
+    res.redirect('/painel');
   } catch (erro) {
     next(erro);
   }

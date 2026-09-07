@@ -70,7 +70,7 @@ async function garantirCache() {
 async function lerMaterias() {
   const { rows } = await pool.query(`
     select
-      m.slug, m.nome, m.icone, m.cor, m.avatar, m.resumo, m.idioma,
+      m.slug, m.nome, m.icone, m.cor, m.avatar, m.resumo, m.idioma, m.aviso,
       coalesce(
         jsonb_agg(
           jsonb_build_object(

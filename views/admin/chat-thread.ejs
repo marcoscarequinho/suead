@@ -1,0 +1,78 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+
+<main id="conteudo">
+  <div class="admin-shell">
+    <div class="admin-topo"><h1>Conversa com <%= conversa.aluno_nome || conversa.aluno_email %></h1></div>
+    <nav class="admin-nav">
+      <a href="/admin">Visão geral</a>
+      <a href="/admin/alunos">Alunos</a>
+      <a href="/admin/planos">Planos</a>
+      <a href="/admin/solicitacoes">Solicitações</a>
+      <a href="/admin/chat" class="ativo">Chat</a>
+    </nav>
+    <p class="nota"><a href="/admin/chat">← Todas as conversas</a></p>
+
+    <div class="admin-chat-thread">
+      <div class="suporte-mensagens" id="mensagens" style="padding: 1.2rem">
+        <% mensagens.forEach(function (m) { %>
+        <div class="suporte-msg <%= m.remetente %>"><%= m.texto %></div>
+        <% }) %>
+      </div>
+      <form class="suporte-form" id="form-resposta">
+        <input type="text" id="texto-resposta" placeholder="Escreva sua resposta…" maxlength="1000" autocomplete="off" required>
+        <button type="submit" aria-label="Enviar">➤</button>
+      </form>
+    </div>
+  </div>
+</main>
+
+<script>
+  (function () {
+    var conversaId = <%= conversa.id %>;
+    var lista = document.getElementById('mensagens');
+    var form = document.getElementById('form-resposta');
+    var campo = document.getElementById('texto-resposta');
+    var total = <%= mensagens.length %>;
+
+    function escapar(texto) {
+      var div = document.createElement('div');
+      div.textContent = texto;
+      return div.innerHTML;
+    }
+
+    function renderizar(mensagens) {
+      if (mensagens.length === total) return;
+      total = mensagens.length;
+      lista.innerHTML = mensagens.map(function (m) {
+        return '<div class="suporte-msg ' + m.remetente + '">' + escapar(m.texto) + '</div>';
+      }).join('');
+      lista.scrollTop = lista.scrollHeight;
+    }
+
+    function buscar() {
+      fetch('/admin/chat/' + conversaId + '/mensagens')
+        .then(function (r) { return r.json(); })
+        .then(function (d) { renderizar(d.mensagens || []); })
+        .catch(function () {});
+    }
+
+    setInterval(buscar, 8000);
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var texto = campo.value.trim();
+      if (!texto) return;
+      campo.value = '';
+      fetch('/admin/chat/' + conversaId + '/mensagens', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ texto: texto })
+      }).then(buscar);
+    });
+
+    lista.scrollTop = lista.scrollHeight;
+  })();
+</script>
+
+<%- include('../partials/footer') %>

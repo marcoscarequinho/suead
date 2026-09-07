@@ -598,6 +598,153 @@ export const materias = [
         ]
       }
     ]
+  },
+  {
+    slug: 'advocacia',
+    nome: 'Advocacia',
+    icone: '⚖️',
+    cor: '#1e3a8a',
+    avatar: 'Prof. Ruy',
+    resumo:
+      'Aulas de apoio para quem já cursa Direito na faculdade: revise institutos, estruture peças e argumentos e prepare provas no seu ritmo, com quantas explicações precisar.',
+    aviso:
+      'Conteúdo de apoio aos estudos de quem já está matriculado em uma faculdade de Direito. Não substitui a formação acadêmica, não configura orientação jurídica para casos concretos e não prepara sozinho para o exame da OAB.',
+    niveis: [
+      {
+        id: 'basico',
+        nome: 'Básico',
+        duracao: '28 aulas · 16h',
+        descricao: 'Introdução ao Direito e bases do sistema jurídico brasileiro.',
+        topicos: [
+          'Noções de Direito e fontes do ordenamento jurídico',
+          'Organização dos poderes e hierarquia das normas',
+          'Introdução ao Direito Civil: pessoas e bens',
+          'Como ler e interpretar uma lei e uma ementa'
+        ]
+      },
+      {
+        id: 'intermediario',
+        nome: 'Intermediário',
+        duracao: '34 aulas · 22h',
+        descricao: 'Os grandes ramos do Direito que sustentam o curso.',
+        topicos: [
+          'Direito Constitucional: direitos fundamentais e controle de constitucionalidade',
+          'Direito Civil: obrigações e contratos',
+          'Direito Penal: teoria do crime',
+          'Direito Processual: princípios e etapas do processo'
+        ]
+      },
+      {
+        id: 'avancado',
+        nome: 'Avançado',
+        duracao: '30 aulas · 20h',
+        descricao: 'Prática jurídica, redação de peças e revisão para provas e OAB.',
+        topicos: [
+          'Estrutura de petição inicial, contestação e recursos',
+          'Direito Administrativo e Direito do Trabalho na prática',
+          'Jurisprudência: como pesquisar e citar precedentes',
+          'Revisão orientada para provas da faculdade e 1ª fase da OAB'
+        ]
+      }
+    ]
+  },
+  {
+    slug: 'medicina',
+    nome: 'Medicina',
+    icone: '🩺',
+    cor: '#059669',
+    avatar: 'Prof. Oswaldo',
+    resumo:
+      'Aulas de apoio para quem já cursa Medicina: revise anatomia, fisiologia e semiologia no seu ritmo, com quantas repetições precisar até o conceito ficar claro.',
+    aviso:
+      'Conteúdo de apoio aos estudos de quem já está matriculado em uma faculdade de Medicina. Não substitui a formação clínica supervisionada, não deve ser usado para diagnóstico, tratamento ou qualquer decisão sobre pacientes reais, e não habilita ao exercício da profissão.',
+    niveis: [
+      {
+        id: 'basico',
+        nome: 'Básico',
+        duracao: '30 aulas · 18h',
+        descricao: 'As bases: anatomia, fisiologia e bioquímica do corpo humano.',
+        topicos: [
+          'Anatomia geral e nomenclatura anatômica',
+          'Fisiologia dos sistemas cardiovascular e respiratório',
+          'Bioquímica básica: metabolismo e enzimas',
+          'Histologia: tecidos e sua organização'
+        ]
+      },
+      {
+        id: 'intermediario',
+        nome: 'Intermediário',
+        duracao: '36 aulas · 24h',
+        descricao: 'Semiologia, patologia e o raciocínio clínico inicial.',
+        topicos: [
+          'Semiologia: anamnese e exame físico',
+          'Patologia geral: inflamação e neoplasias',
+          'Farmacologia básica: mecanismos de ação',
+          'Microbiologia e imunologia aplicadas'
+        ]
+      },
+      {
+        id: 'avancado',
+        nome: 'Avançado',
+        duracao: '32 aulas · 22h',
+        descricao: 'Clínica médica, revisão de casos e preparação para provas práticas.',
+        topicos: [
+          'Clínica médica: principais síndromes por sistema',
+          'Interpretação de exames laboratoriais e de imagem',
+          'Discussão de casos clínicos para revisão de provas',
+          'Ética médica e comunicação com o paciente'
+        ]
+      }
+    ]
+  },
+  {
+    slug: 'transito',
+    nome: 'Trânsito',
+    icone: '🚦',
+    cor: '#ea580c',
+    avatar: 'Prof. Cauã',
+    resumo:
+      'Aulas de apoio para quem estuda legislação de trânsito, direção defensiva e primeiros socorros — reforço para a prova teórica e para quem já frequenta um CFC.',
+    aviso:
+      'Conteúdo de apoio aos estudos de legislação e educação para o trânsito. Não substitui as aulas teóricas e práticas obrigatórias de um Centro de Formação de Condutores (CFC) credenciado, nem qualquer exigência do DETRAN para obtenção ou renovação da CNH.',
+    niveis: [
+      {
+        id: 'basico',
+        nome: 'Básico',
+        duracao: '24 aulas · 14h',
+        descricao: 'Legislação de trânsito e sinalização para a prova teórica.',
+        topicos: [
+          'Código de Trânsito Brasileiro: princípios e definições',
+          'Sinalização vertical, horizontal e sonora',
+          'Normas gerais de circulação e conduta',
+          'Infrações, penalidades e pontuação na carteira'
+        ]
+      },
+      {
+        id: 'intermediario',
+        nome: 'Intermediário',
+        duracao: '20 aulas · 12h',
+        descricao: 'Direção defensiva e comportamento no trânsito.',
+        topicos: [
+          'Direção defensiva: riscos e prevenção de acidentes',
+          'Distância de segurança, velocidade e condições adversas',
+          'Convivência com pedestres, ciclistas e motociclistas',
+          'Meio ambiente e direção econômica'
+        ]
+      },
+      {
+        id: 'avancado',
+        nome: 'Avançado',
+        duracao: '18 aulas · 10h',
+        descricao: 'Primeiros socorros e revisão final para a prova do DETRAN.',
+        topicos: [
+          'Primeiros socorros: avaliação inicial da cena e da vítima',
+          'Procedimentos básicos até a chegada do socorro especializado',
+          'Simulados comentados no estilo da prova do DETRAN',
+          'Documentação, categorias de habilitação e processo de CNH'
+        ]
+      }
+    ]
   }
 ];
 

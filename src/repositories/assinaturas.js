@@ -3,18 +3,30 @@
 import { pool, temBanco } from '../db/pool.js';
 
 export async function criarAssinatura({
-  alunoId, planoCodigo, planoNome, valor, parcelas, ciclo, referencia, preferenceId
+  alunoId, planoCodigo, planoNome, valor, parcelas, ciclo, referencia, preferenceId, materiaEscolhida
 }) {
   if (!temBanco) throw new Error('Assinatura indisponível: banco não configurado.');
 
   const { rows } = await pool.query(
     `insert into assinaturas
-       (aluno_id, plano_codigo, plano_nome, valor, parcelas, ciclo, referencia, preference_id)
-     values ($1, $2, $3, $4, $5, $6, $7, $8)
+       (aluno_id, plano_codigo, plano_nome, valor, parcelas, ciclo, referencia, preference_id, materia_escolhida)
+     values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
      returning *`,
-    [alunoId, planoCodigo, planoNome, valor, parcelas, ciclo, referencia, preferenceId ?? null]
+    [alunoId, planoCodigo, planoNome, valor, parcelas, ciclo, referencia, preferenceId ?? null,
+     materiaEscolhida ?? null]
   );
   return rows[0];
+}
+
+/** Usado pelo admin ao aprovar uma solicitacao de troca de materia. */
+export async function atualizarMateriaEscolhida(assinaturaId, materiaSlug) {
+  if (!temBanco) return null;
+  const { rows } = await pool.query(
+    `update assinaturas set materia_escolhida = $2, atualizado_em = now()
+      where id = $1 returning *`,
+    [assinaturaId, materiaSlug]
+  );
+  return rows[0] ?? null;
 }
 
 export async function buscarPorReferencia(referencia) {

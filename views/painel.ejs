@@ -40,6 +40,39 @@
         <a href="/#planos" class="btn btn-primario">Ver planos</a>
       <% } %>
     </div>
+
+    <% if (assinatura && assinatura.plano_codigo === 'materia') { %>
+    <div class="cartao" style="margin-top: 1rem">
+      <% if (materiaLiberada) { %>
+        <p>Matéria liberada pelo seu plano: <strong><%= materiaLiberada.icone %> <%= materiaLiberada.nome %></strong></p>
+      <% } else { %>
+        <p>Nenhuma matéria vinculada a este plano ainda.</p>
+      <% } %>
+
+      <% if (solicitacaoPendente) { %>
+        <p class="nota">Pedido de troca para <strong><%= solicitacaoPendente.materia_solicitada %></strong> em análise pelo admin.</p>
+      <% } else { %>
+        <details>
+          <summary>Solicitar troca de matéria</summary>
+          <form method="post" action="/painel/solicitar-troca" class="form-troca-materia">
+            <label>
+              Nova matéria
+              <select name="materia" required>
+                <% materias.filter(function (m) { return !materiaLiberada || m.slug !== materiaLiberada.slug; }).forEach(function (m) { %>
+                <option value="<%= m.slug %>"><%= m.nome %></option>
+                <% }) %>
+              </select>
+            </label>
+            <label>
+              Motivo (opcional)
+              <input type="text" name="motivo" maxlength="200" placeholder="Por que quer trocar?">
+            </label>
+            <button type="submit" class="btn btn-secundario">Enviar pedido ao admin</button>
+          </form>
+        </details>
+      <% } %>
+    </div>
+    <% } %>
   </section>
 
   <!-- Trilha do aluno -->

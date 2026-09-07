@@ -42,6 +42,26 @@ export function exigirLogin(req, res, next) {
 
 /** Impede que quem ja esta logado veja as telas de login/cadastro. */
 export function apenasVisitante(req, res, next) {
-  if (req.aluno) return res.redirect('/painel');
+  if (req.aluno) return res.redirect(req.aluno.tipo === 'admin' ? '/admin' : '/painel');
   next();
+}
+
+/**
+ * Area do admin: sem sessao vai para o login; logado mas sem o papel 'admin'
+ * recebe 404 (nao denuncia que a rota existe).
+ */
+export function exigirAdmin(req, res, next) {
+  if (req.aluno?.tipo === 'admin') return next();
+
+  if (!req.aluno) {
+    req.session.destino = req.originalUrl;
+    return res.redirect('/login');
+  }
+
+  res.status(404);
+  res.render('404', {
+    titulo: 'Página não encontrada — EducaAI',
+    descricao: 'A página que você procura não existe.',
+    pagina: ''
+  });
 }

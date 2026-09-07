@@ -103,7 +103,8 @@ router.post('/login', apenasVisitante, async (req, res, next) => {
 
     const destino = req.session.destino;
     await entrar(req, aluno);
-    res.redirect(destino && destino.startsWith('/') ? destino : '/painel');
+    if (destino && destino.startsWith('/')) return res.redirect(destino);
+    res.redirect(aluno.tipo === 'admin' ? '/admin' : '/painel');
   } catch (erro) {
     next(erro);
   }

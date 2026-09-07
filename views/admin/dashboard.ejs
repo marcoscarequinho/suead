@@ -1,0 +1,80 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+
+<main id="conteudo">
+  <div class="admin-shell">
+    <div class="admin-topo"><h1>Painel admin</h1></div>
+    <nav class="admin-nav">
+      <a href="/admin" class="ativo">Visão geral</a>
+      <a href="/admin/alunos">Alunos</a>
+      <a href="/admin/planos">Planos</a>
+      <a href="/admin/solicitacoes">Solicitações<% if (resumo && resumo.solicitacoes_pendentes) { %> (<%= resumo.solicitacoes_pendentes %>)<% } %></a>
+      <a href="/admin/chat">Chat<% if (resumo && resumo.mensagens_nao_lidas) { %> (<%= resumo.mensagens_nao_lidas %>)<% } %></a>
+    </nav>
+
+    <% if (resumo) { %>
+    <div class="admin-numeros">
+      <div class="admin-numero"><strong><%= resumo.alunos %></strong><span>alunos cadastrados</span></div>
+      <div class="admin-numero"><strong><%= resumo.assinaturas_ativas %></strong><span>assinaturas ativas</span></div>
+      <div class="admin-numero"><strong><%= resumo.isencoes_ativas %></strong><span>isenções ativas</span></div>
+      <div class="admin-numero"><strong><%= resumo.solicitacoes_pendentes %></strong><span>trocas pendentes</span></div>
+      <div class="admin-numero"><strong><%= resumo.mensagens_nao_lidas %></strong><span>mensagens não lidas</span></div>
+      <div class="admin-numero"><strong><%= resumo.topicos_forum %></strong><span>tópicos no fórum</span></div>
+    </div>
+    <% } %>
+
+    <div class="admin-cartao">
+      <h2>Assinaturas ativas por plano</h2>
+      <% if (!porPlano.length) { %>
+        <p class="admin-vazio">Nenhuma assinatura ativa ainda.</p>
+      <% } else { %>
+        <table class="admin-tabela">
+          <thead><tr><th>Plano</th><th>Ativas</th></tr></thead>
+          <tbody>
+            <% porPlano.forEach(function (p) { %>
+            <tr><td><%= p.plano_nome %></td><td><%= p.total %></td></tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } %>
+    </div>
+
+    <div class="admin-cartao">
+      <h2>Solicitações pendentes recentes</h2>
+      <% if (!solicitacoes.length) { %>
+        <p class="admin-vazio">Nenhuma solicitação pendente.</p>
+      <% } else { %>
+        <table class="admin-tabela">
+          <thead><tr><th>Aluno</th><th>De</th><th>Para</th></tr></thead>
+          <tbody>
+            <% solicitacoes.forEach(function (s) { %>
+            <tr><td><%= s.aluno_nome || s.aluno_email %></td><td><%= s.materia_atual || '—' %></td><td><%= s.materia_solicitada %></td></tr>
+            <% }) %>
+          </tbody>
+        </table>
+        <p class="nota"><a href="/admin/solicitacoes">Ver todas →</a></p>
+      <% } %>
+    </div>
+
+    <div class="admin-cartao">
+      <h2>Conversas recentes</h2>
+      <% if (!conversas.length) { %>
+        <p class="admin-vazio">Nenhuma conversa ainda.</p>
+      <% } else { %>
+        <div class="admin-chat-lista">
+          <% conversas.forEach(function (c) { %>
+          <a class="admin-chat-item" href="/admin/chat/<%= c.id %>">
+            <div>
+              <strong><%= c.aluno_nome || c.aluno_email %></strong>
+              <p><%= c.ultima_mensagem ? c.ultima_mensagem.slice(0, 60) : 'Sem mensagens' %></p>
+            </div>
+            <% if (c.nao_lidas > 0) { %><span class="tag tag-pendente"><%= c.nao_lidas %></span><% } %>
+          </a>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

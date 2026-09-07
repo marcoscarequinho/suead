@@ -1,7 +1,7 @@
 // Rotas de assinatura: inicio do checkout, retorno do aluno e webhook.
 
 import { Router } from 'express';
-import { listarPlanos } from '../repositories/conteudo.js';
+import { listarPlanos, buscarMateria } from '../repositories/conteudo.js';
 import {
   criarAssinatura,
   buscarPorReferencia,
@@ -44,6 +44,23 @@ router.post('/assinar/:plano', exigirLogin, async (req, res, next) => {
       });
     }
 
+    // Plano "Por Matéria": o aluno escolhe qual matéria fica liberada no checkout.
+    let materiaEscolhida = null;
+    if (plano.id === 'materia') {
+      const materia = await buscarMateria(req.body.materia);
+      if (!materia) {
+        return res.status(400).render('assinatura', {
+          titulo: 'Escolha uma matéria — EducaAI',
+          descricao: 'Selecione a matéria antes de continuar.',
+          pagina: 'assinatura',
+          estado: 'erro',
+          mensagem: 'Escolha uma matéria na lista antes de assinar este plano.',
+          assinatura: null
+        });
+      }
+      materiaEscolhida = materia.slug;
+    }
+
     if (!pagamentoConfigurado) {
       return res.status(503).render('assinatura', {
         titulo: 'Pagamento indisponível — EducaAI',
@@ -68,7 +85,8 @@ router.post('/assinar/:plano', exigirLogin, async (req, res, next) => {
       parcelas: cobranca.parcelas,
       ciclo: cobranca.ciclo,
       referencia,
-      preferenceId: preferencia.preferenceId
+      preferenceId: preferencia.preferenceId,
+      materiaEscolhida
     });
 
     // Guarda a referência para reconhecer o aluno quando ele voltar do gateway.

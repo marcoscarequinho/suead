@@ -11,6 +11,9 @@ import paginas from './src/routes/pages.js';
 import api from './src/routes/api.js';
 import autenticacao from './src/routes/auth.js';
 import pagamento from './src/routes/pagamento.js';
+import admin from './src/routes/admin.js';
+import forum from './src/routes/forum.js';
+import suporte from './src/routes/suporte.js';
 import { pool, temBanco, verificarConexao } from './src/db/pool.js';
 import { carregarConteudo, origemDados } from './src/repositories/conteudo.js';
 import { carregarAluno } from './src/middleware/auth.js';
@@ -63,6 +66,9 @@ app.use(carregarAluno);
 app.use('/api', api);
 app.use('/', autenticacao);
 app.use('/', pagamento);
+app.use('/', suporte);
+app.use('/', forum);
+app.use('/admin', admin);
 app.use('/', paginas);
 
 // 404
