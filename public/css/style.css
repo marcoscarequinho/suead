@@ -24,6 +24,11 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* O atributo [hidden] tem a mesma especificidade de regras de classe como
+   .suporte-painel { display: flex }, e o autor sempre vence o user-agent —
+   sem isso, "hidden" é ignorado sempre que a classe define display. */
+[hidden] { display: none !important; }
+
 html { scroll-behavior: smooth; scroll-padding-top: 90px; }
 
 body {

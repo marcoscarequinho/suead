@@ -152,9 +152,11 @@
       <li><strong>4. Evolua de nível</strong><span>Avaliações liberam o próximo estágio da matéria.</span></li>
     </ol>
 
+    <% if (typeof aluno === 'undefined' || !aluno) { %>
     <div class="centralizar">
       <a href="/aula/matematica/basico" class="btn btn-claro btn-grande">Ver uma aula demonstrativa</a>
     </div>
+    <% } %>
   </section>
 
   <!-- ============ DEPOIMENTOS ============ -->

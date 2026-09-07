@@ -12,8 +12,13 @@
     <% } %>
     <p class="capa-avatar">Professor avatar: <strong><%= materia.avatar %></strong></p>
     <div class="hero-acoes">
+      <% if (typeof aluno === 'undefined' || !aluno) { %>
       <a href="/aula/<%= materia.slug %>/basico" class="btn btn-claro btn-grande">Assistir aula demonstrativa</a>
       <a href="/area-do-aluno" class="btn btn-contorno btn-grande">Fazer nivelamento</a>
+      <% } else { %>
+      <a href="/aula/<%= materia.slug %>/basico" class="btn btn-claro btn-grande">Abrir sala de aula</a>
+      <a href="/painel" class="btn btn-contorno btn-grande">Ir para o meu painel</a>
+      <% } %>
     </div>
   </section>
 
