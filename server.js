@@ -14,6 +14,7 @@ import pagamento from './src/routes/pagamento.js';
 import admin from './src/routes/admin.js';
 import forum from './src/routes/forum.js';
 import suporte from './src/routes/suporte.js';
+import cron from './src/routes/cron.js';
 import { pool, temBanco, verificarConexao } from './src/db/pool.js';
 import { carregarConteudo, origemDados } from './src/repositories/conteudo.js';
 import { carregarAluno } from './src/middleware/auth.js';
@@ -63,6 +64,7 @@ app.use(
 app.use(carregarAluno);
 
 // ---------- Rotas ----------
+app.use('/api/cron', cron);
 app.use('/api', api);
 app.use('/', autenticacao);
 app.use('/', pagamento);

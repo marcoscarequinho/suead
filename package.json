@@ -11,7 +11,9 @@
     "db:setup": "node src/db/setup.js",
     "admin:criar": "node src/db/criar-admin.js",
     "pagamentos:conciliar": "node src/db/conciliar.js",
-    "icones": "node scripts/gerar-icones.mjs"
+    "icones": "node scripts/gerar-icones.mjs",
+    "whatsapp:grupos": "node scripts/whatsapp-grupos.mjs",
+    "whatsapp:disparar": "node scripts/whatsapp-disparo.mjs"
   },
   "engines": {
     "node": ">=20"

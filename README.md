@@ -274,6 +274,35 @@ para que a interface funcione de ponta a ponta na demonstração:
    aproveitamento do teste (≥80% avançado, ≥50% intermediário, abaixo disso básico)
    no ponto de partida do aluno.
 
+## Divulgação diária no WhatsApp
+
+Todo dia às **10:00 (horário de Brasília)** a Vercel chama `/api/cron/divulgacao-whatsapp`, que envia uma chamada curta + o link do site para os grupos listados em `src/data/grupos-whatsapp.js`.
+
+A API oficial da Meta **não envia mensagem para grupo** — por isso o disparo passa por um gateway. `src/services/whatsapp.js` fala com dois:
+
+| `WHATSAPP_PROVIDER` | Serviço | Variáveis |
+| --- | --- | --- |
+| `zapi` | Z-API (SaaS) | `ZAPI_INSTANCE`, `ZAPI_TOKEN`, `ZAPI_CLIENT_TOKEN` |
+| `evolution` | Evolution API (self-hosted) | `EVOLUTION_URL`, `EVOLUTION_INSTANCE`, `EVOLUTION_API_KEY` |
+| *(vazio)* | modo simulado | — |
+
+Sem provedor configurado o serviço roda **simulado**: registra no log o que seria enviado, sem gastar mensagem. Dá para testar a rota, o cron e o relatório antes de conectar o número.
+
+### Como configurar
+
+1. Conecte o número no gateway escolhido (leitura do QR code no painel) e preencha as variáveis no `.env`.
+2. Rode `npm run whatsapp:grupos`. O script lista os grupos da instância, casa com os nomes já cadastrados e imprime o array pronto para colar em `src/data/grupos-whatsapp.js` — o WhatsApp só aceita envio por id (`120363...@g.us`), nunca por nome.
+3. Teste com `npm run whatsapp:disparar`, que executa o disparo na hora.
+4. Cadastre `CRON_SECRET` no painel da Vercel (mesmo valor do `.env`). A Vercel envia esse segredo como `Authorization: Bearer`; sem ele a rota responde 401 e ninguém dispara pelo endereço público.
+
+O agendamento vive em `vercel.json` (`"schedule": "0 13 * * *"` — 13:00 UTC = 10:00 BRT). No plano Hobby a Vercel permite um cron por dia e dispara dentro da hora agendada, não no minuto exato.
+
+### Cuidados
+
+- Automação de grupo viola os Termos do WhatsApp e o número pode ser banido. Use um chip secundário, nunca o número principal.
+- O envio tem intervalo entre os grupos (`DIVULGACAO_INTERVALO_MS`, 8s por padrão): 12 grupos no mesmo segundo é o padrão que marca o número como robô.
+- Grupo com `id` vazio é pulado e sai no relatório como pendente. Para pausar sem perder o id, troque `ativo` para `false`.
+
 ## Próximos passos sugeridos
 
 - Emissão de certificado e regras de expiração da assinatura
