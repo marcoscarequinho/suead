@@ -16,9 +16,10 @@
     <a href="/#como-funciona">Como Funciona</a>
     <a href="/#planos">Planos</a>
 
-    <%# Aparece so quando o navegador oferece a instalacao (ver main.js). %>
+    <%# Chrome/Edge: aparece quando o navegador oferece a instalacao.
+        iPhone/iPad: aparece sempre e abre o passo a passo (ver main.js). %>
     <button type="button" class="btn btn-secundario btn-instalar" id="btn-instalar" hidden>
-      <span aria-hidden="true">⬇</span> Instalar app
+      <span aria-hidden="true">⬇</span> <span class="btn-instalar-texto">Instalar app</span>
     </button>
 
     <% if (typeof aluno !== 'undefined' && aluno) { %>
@@ -42,3 +43,18 @@
     <% } %>
   </nav>
 </header>
+
+<%# Passo a passo do iPhone/iPad: o Safari nao tem convite automatico de instalacao. %>
+<div class="instalar-ios" id="instalar-ios" hidden role="dialog" aria-modal="true" aria-labelledby="instalar-ios-titulo">
+  <div class="instalar-ios-caixa">
+    <button type="button" class="instalar-ios-fechar" id="instalar-ios-fechar" aria-label="Fechar">✕</button>
+    <h2 id="instalar-ios-titulo">Adicionar à tela de início</h2>
+    <p>No iPhone e no iPad o atalho é criado pelo próprio Safari, em três toques:</p>
+    <ol class="instalar-ios-passos">
+      <li>Toque em <strong>Compartilhar</strong> <span aria-hidden="true">⬆️</span> na barra do Safari.</li>
+      <li>Role a lista e escolha <strong>Adicionar à Tela de Início</strong>.</li>
+      <li>Confirme em <strong>Adicionar</strong> — o EducaAI vira um ícone na sua tela.</li>
+    </ol>
+    <p class="instalar-ios-nota">Está em outro navegador? Abra este site no <strong>Safari</strong> para ver essa opção.</p>
+  </div>
+</div>

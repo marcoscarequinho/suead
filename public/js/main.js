@@ -613,24 +613,69 @@
     });
   }
 
-  // O Chrome/Edge guarda o convite de instalacao: seguramos o evento e
-  // mostramos nosso proprio botao no cabecalho.
+  // No iPhone/iPad o Safari nao dispara "beforeinstallprompt": la o atalho
+  // e criado a mao pelo menu Compartilhar, entao mostramos o passo a passo.
   const btnInstalar = document.getElementById("btn-instalar");
+  const passoIOS = document.getElementById("instalar-ios");
   let convite = null;
 
+  const ehIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const jaInstalado = window.matchMedia("(display-mode: standalone)").matches ||
+    navigator.standalone === true;
+
+  function abrirPassoIOS() {
+    if (!passoIOS) return;
+    if (menu && menuBtn) {
+      menu.classList.remove("aberto");
+      menuBtn.setAttribute("aria-expanded", "false");
+    }
+    passoIOS.hidden = false;
+    document.body.classList.add("sem-rolagem");
+    const fechar = document.getElementById("instalar-ios-fechar");
+    if (fechar) fechar.focus();
+  }
+
+  function fecharPassoIOS() {
+    if (!passoIOS) return;
+    passoIOS.hidden = true;
+    document.body.classList.remove("sem-rolagem");
+    if (btnInstalar) btnInstalar.focus();
+  }
+
+  if (passoIOS) {
+    passoIOS.addEventListener("click", (e) => {
+      if (e.target === passoIOS || e.target.id === "instalar-ios-fechar") fecharPassoIOS();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !passoIOS.hidden) fecharPassoIOS();
+    });
+  }
+
+  // O Chrome/Edge guarda o convite de instalacao: seguramos o evento e
+  // mostramos nosso proprio botao no cabecalho.
   window.addEventListener("beforeinstallprompt", (evento) => {
     evento.preventDefault();
     convite = evento;
     if (btnInstalar) btnInstalar.hidden = false;
   });
 
+  if (btnInstalar && ehIOS && !jaInstalado) {
+    btnInstalar.hidden = false;
+    const rotulo = btnInstalar.querySelector(".btn-instalar-texto");
+    if (rotulo) rotulo.textContent = "Adicionar à tela de início";
+  }
+
   if (btnInstalar) {
     btnInstalar.addEventListener("click", async () => {
-      if (!convite) return;
-      convite.prompt();
-      await convite.userChoice;
-      convite = null;
-      btnInstalar.hidden = true;
+      if (convite) {
+        convite.prompt();
+        await convite.userChoice;
+        convite = null;
+        btnInstalar.hidden = true;
+        return;
+      }
+      if (ehIOS) abrirPassoIOS();
     });
   }
 
